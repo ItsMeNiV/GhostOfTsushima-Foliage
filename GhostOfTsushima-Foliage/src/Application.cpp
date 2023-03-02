@@ -2,13 +2,11 @@
 #include "Application.h"
 
 Application::Application()
-    : m_Camera(CreateRef<Camera>(glm::vec3(0.0f, 2.0f, 3.0f), m_WindowWidth, m_WindowHeight)),
+    : m_Camera(CreateRef<Camera>(glm::vec3(0.0f, 0.0f, 3.0f), m_WindowWidth, m_WindowHeight)),
       m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 3.0f, 0.1f))
 {
     initOpenGLWithGLFW(m_WindowTitle, m_WindowWidth, m_WindowHeight);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
     glfwSwapInterval(0);
     disableCursor();
     glfwSetWindowUserPointer(window, reinterpret_cast<void*>(this));
@@ -49,7 +47,7 @@ void Application::Run()
         processInput(window, deltaTime);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
