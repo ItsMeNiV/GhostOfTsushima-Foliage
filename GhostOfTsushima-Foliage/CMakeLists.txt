@@ -19,7 +19,8 @@ set(SRC_FILES
  "src/World/World.h" "src/World/World.cpp"
  "src/Renderer/Renderer.h" "src/Renderer/Renderer.cpp"
  "src/Util/Texture.h" "src/Util/Texture.cpp"
- "src/Util/Util.h")
+ "src/Util/Util.h"
+ "src/Renderer/Mesh.h" "src/Renderer/Mesh.cpp")
 
 #GLFW
 add_subdirectory("vendor/glfw")

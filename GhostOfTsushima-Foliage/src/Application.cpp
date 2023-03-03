@@ -2,7 +2,7 @@
 #include "Application.h"
 
 Application::Application()
-    : m_Camera(CreateRef<Camera>(glm::vec3(0.0f, 0.0f, 3.0f), m_WindowWidth, m_WindowHeight)),
+    : m_Camera(CreateRef<Camera>(glm::vec3(0.0f, 3.0f, 0.0f), m_WindowWidth, m_WindowHeight)),
       m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 3.0f, 0.1f))
 {
     initOpenGLWithGLFW(m_WindowTitle, m_WindowWidth, m_WindowHeight);
@@ -59,7 +59,7 @@ void Application::loadWorld(uint32_t worldNumber)
     switch (worldNumber)
     {
     case 0:
-        m_World = CreateRef<World>("World 0", 1024, 1024, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"));
+        m_World = CreateRef<World>("World 0", 15, 15, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"));
         break;
     default:
         std::cout << "World with the given number " << std::to_string(worldNumber) << " not available!" << std::endl;

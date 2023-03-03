@@ -8,6 +8,8 @@ class World
 public:
 	World(std::string&& name, uint32_t width, uint32_t height, Ref<Texture> heightmapTexture);
 
+	std::unordered_map<glm::ivec2, Ref<Chunk>, Util::HashVec2>& GetChunks() { return m_Chunks; }
+
 private:
 	std::string m_Name;
 	uint32_t m_Width;
