@@ -24,10 +24,13 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+	uint32_t GetIndexCount() { return m_IndexCount; }
+
 private:
 	unsigned int m_VertexArray;
 	unsigned int m_VertexBuffer;
 	unsigned int m_IndexBuffer;
+	uint32_t m_IndexCount;
 
 	void generateMesh(uint32_t width);
 };

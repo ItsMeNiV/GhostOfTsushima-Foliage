@@ -36,6 +36,10 @@ Application::~Application()
 
 void Application::Run()
 {
+    Shader terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
+    terrainShader.Use();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
     mainLoop
@@ -49,6 +53,15 @@ void Application::Run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 viewProjection = m_Camera->GetViewProjection();
+        terrainShader.SetMat4("viewProjection", viewProjection);
+        terrainShader.SetInt("heightmapTexture", 0);
+        m_World->GetHeightmapTexture()->ActivateForSlot(0);
+        for (auto& chunks : m_World->GetChunks())
+        {
+            chunks.second->Draw(terrainShader);
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -59,7 +72,7 @@ void Application::loadWorld(uint32_t worldNumber)
     switch (worldNumber)
     {
     case 0:
-        m_World = CreateRef<World>("World 0", 15, 15, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"));
+        m_World = CreateRef<World>("World 0", 5, 5, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"));
         break;
     default:
         std::cout << "World with the given number " << std::to_string(worldNumber) << " not available!" << std::endl;

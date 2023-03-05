@@ -10,6 +10,8 @@ public:
 
 	std::unordered_map<glm::ivec2, Ref<Chunk>, Util::HashVec2>& GetChunks() { return m_Chunks; }
 
+	Ref<Texture>& GetHeightmapTexture() { return m_HeightmapTexture; }
+
 private:
 	std::string m_Name;
 	uint32_t m_Width;
