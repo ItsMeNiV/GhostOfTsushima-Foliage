@@ -26,7 +26,7 @@ void TerrainMesh::generateMesh(uint32_t width, glm::vec2 textureCoordStartingPoi
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
 
-	uint32_t chunkResolution = 2; // Vertices per "Unit" (width is in Units)
+	uint32_t chunkResolution = 10; // Vertices per "Unit" (width is in Units)
 	uint32_t vertsPerSide = width * chunkResolution;
 	uint32_t vertexCount = pow(vertsPerSide, 2);
 	float distanceOfPoints = float(width) / (vertsPerSide-1);
