@@ -20,7 +20,9 @@ set(SRC_FILES
  "src/Renderer/Renderer.h" "src/Renderer/Renderer.cpp"
  "src/Util/Texture.h" "src/Util/Texture.cpp"
  "src/Util/Util.h"
- "src/Renderer/TerrainMesh.h" "src/Renderer/TerrainMesh.cpp")
+ "src/Renderer/TerrainMesh.h" "src/Renderer/TerrainMesh.cpp"
+ "src/World/Skybox.h" "src/World/Skybox.cpp"
+ )
 
 #GLFW
 add_subdirectory("vendor/glfw")

@@ -3,7 +3,7 @@
 
 Application::Application()
     : m_Camera(CreateRef<Camera>(glm::vec3(30.0f, 7.0f, 30.0f), m_WindowWidth, m_WindowHeight)),
-      m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 3.0f, 0.1f))
+      m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 10.0f, 0.1f))
 {
     initOpenGLWithGLFW(m_WindowTitle, m_WindowWidth, m_WindowHeight);
     glEnable(GL_DEPTH_TEST);
@@ -36,8 +36,8 @@ Application::~Application()
 
 void Application::Run()
 {
+    Shader skyboxShader("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
     Shader terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
-    terrainShader.Use();
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     float deltaTime = 0.0f;
@@ -53,14 +53,25 @@ void Application::Run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        //Terrain
+        terrainShader.Use();
         glm::mat4 viewProjection = m_Camera->GetViewProjection();
         terrainShader.SetMat4("viewProjection", viewProjection);
         terrainShader.SetInt("heightmapTexture", 0);
         m_World->GetHeightmapTexture()->ActivateForSlot(0);
+        terrainShader.SetInt("diffuseTexture", 1);
+        m_World->GetDiffuseTexture()->ActivateForSlot(1);
         for (auto& chunks : m_World->GetChunks())
         {
             chunks.second->Draw(terrainShader);
         }
+
+        //Skybox
+        skyboxShader.Use();
+        skyboxShader.SetMat4("projection", m_Camera->GetProjection());
+        glm::mat4 view = glm::mat4(glm::mat3(m_Camera->GetView()));
+        skyboxShader.SetMat4("view", view);
+        m_World->GetSkybox()->Draw(skyboxShader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -69,10 +80,19 @@ void Application::Run()
 
 void Application::loadWorld(uint32_t worldNumber)
 {
+    std::vector<std::string> skyboxFaces = {
+        "assets/textures/skybox/right.jpg",
+        "assets/textures/skybox/left.jpg",
+        "assets/textures/skybox/top.jpg",
+        "assets/textures/skybox/bottom.jpg",
+        "assets/textures/skybox/front.jpg",
+        "assets/textures/skybox/back.jpg"
+    };
+    Ref<Skybox> skybox = CreateRef<Skybox>(CreateRef<Texture>(skyboxFaces));
     switch (worldNumber)
     {
     case 0:
-        m_World = CreateRef<World>("World 0", 5, 5, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"));
+        m_World = CreateRef<World>("World 0", 5, 5, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"), CreateRef<Texture>("assets/textures/HillDiffuse.png"), skybox);
         break;
     default:
         std::cout << "World with the given number " << std::to_string(worldNumber) << " not available!" << std::endl;
@@ -131,12 +151,12 @@ void Application::processInput(GLFWwindow* window, float deltaTime)
         m_CameraController->ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && !m_Sprinting)
     {
-        m_CameraController->SetSpeed(8.0f);
+        m_CameraController->SetSpeed(15.0f);
         m_Sprinting = true;
     }
     else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE && m_Sprinting)
     {
-        m_CameraController->SetSpeed(3.0f);
+        m_CameraController->SetSpeed(10.0f);
         m_Sprinting = false;
     }
 }

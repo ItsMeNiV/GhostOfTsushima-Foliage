@@ -40,10 +40,7 @@ Texture::Texture(std::vector<std::string> paths, bool flipVertically)
     glGenTextures(1, &m_TextureId);
     glBindTexture(m_TextureType, m_TextureId);
 
-    glTexParameteri(m_TextureType, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(m_TextureType, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(m_TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(m_TextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
 
     int width, height, nrChannels;
     for (unsigned int i = 0; i < paths.size(); i++)
@@ -61,6 +58,12 @@ Texture::Texture(std::vector<std::string> paths, bool flipVertically)
             stbi_image_free(data);
         }
     }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 Texture::~Texture()
