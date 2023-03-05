@@ -29,8 +29,8 @@ void Mesh::generateMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm
 	uint32_t chunkResolution = 2; // Vertices per "Unit" (width is in Units)
 	uint32_t vertsPerSide = width * chunkResolution;
 	uint32_t vertexCount = pow(vertsPerSide, 2);
-	float distanceOfPoints = float(width) / vertsPerSide;
-	glm::vec2 distanceOfTexturePoints = (textureCoordinateEndPoint - textureCoordStartingPoint) / float(vertsPerSide);
+	float distanceOfPoints = float(width) / (vertsPerSide-1);
+	glm::vec2 distanceOfTexturePoints = (textureCoordinateEndPoint - textureCoordStartingPoint) / float(vertsPerSide-1);
 	vertices.resize(vertexCount);
 
 

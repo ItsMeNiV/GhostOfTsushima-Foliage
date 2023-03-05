@@ -2,7 +2,7 @@
 #include "Application.h"
 
 Application::Application()
-    : m_Camera(CreateRef<Camera>(glm::vec3(0.0f, 3.0f, 0.0f), m_WindowWidth, m_WindowHeight)),
+    : m_Camera(CreateRef<Camera>(glm::vec3(30.0f, 7.0f, 30.0f), m_WindowWidth, m_WindowHeight)),
       m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 3.0f, 0.1f))
 {
     initOpenGLWithGLFW(m_WindowTitle, m_WindowWidth, m_WindowHeight);
