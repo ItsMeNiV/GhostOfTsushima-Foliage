@@ -9,6 +9,6 @@ uniform sampler2D heightmapTexture;
 
 void main()
 {
-    float height = texture(heightmapTexture, aTexCoords).x * 5;
+    float height = texture(heightmapTexture, aTexCoords).x * 10;
     gl_Position = viewProjection * model * vec4(aPos.x, height, aPos.y, 1.0);
 }

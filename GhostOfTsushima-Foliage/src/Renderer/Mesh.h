@@ -9,7 +9,7 @@ struct VertexData
 class Mesh
 {
 public:
-	Mesh(uint32_t width);
+	Mesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint);
 
 	inline void Bind()
 	{
@@ -32,5 +32,5 @@ private:
 	unsigned int m_IndexBuffer;
 	uint32_t m_IndexCount;
 
-	void generateMesh(uint32_t width);
+	void generateMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint);
 };

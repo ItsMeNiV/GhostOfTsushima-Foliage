@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Mesh.h"
 
-Mesh::Mesh(uint32_t width)
+Mesh::Mesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint)
 {
 	glGenVertexArrays(1, &m_VertexArray);
 	glBindVertexArray(m_VertexArray);
@@ -11,7 +11,7 @@ Mesh::Mesh(uint32_t width)
 	glGenBuffers(1, &m_IndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
 
-	generateMesh(width);
+	generateMesh(width, textureCoordStartingPoint, textureCoordinateEndPoint);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0); // 2 Floats (Position X, Z)
 	glEnableVertexAttribArray(0);
@@ -21,7 +21,7 @@ Mesh::Mesh(uint32_t width)
 	Unbind();
 }
 
-void Mesh::generateMesh(uint32_t width)
+void Mesh::generateMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint)
 {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
@@ -30,25 +30,25 @@ void Mesh::generateMesh(uint32_t width)
 	uint32_t vertsPerSide = width * chunkResolution;
 	uint32_t vertexCount = pow(vertsPerSide, 2);
 	float distanceOfPoints = float(width) / vertsPerSide;
-	float distanceOfTexturePoints = 1.0f / vertsPerSide;
+	glm::vec2 distanceOfTexturePoints = (textureCoordinateEndPoint - textureCoordStartingPoint) / float(vertsPerSide);
 	vertices.resize(vertexCount);
 
 
 	float zPos = 0.0f;
-	glm::vec2 textureCoords = { 0.0f, 0.0f };
+	glm::vec2 textureCoords = textureCoordStartingPoint;
 	for (uint32_t z = 0; z < vertsPerSide; z++)
 	{
 		float xPos = 0.0f;
-		textureCoords.x = 0.0f;
+		textureCoords.x = textureCoordStartingPoint.x;
 		for (uint32_t x = 0; x < vertsPerSide; x++)
 		{
 			VertexData vert = { {xPos, zPos}, textureCoords };
 			vertices[(z * vertsPerSide) + x] = vert;
 			xPos += distanceOfPoints;
-			textureCoords.x += distanceOfTexturePoints;
+			textureCoords.x += distanceOfTexturePoints.x;
 		}
 		zPos += distanceOfPoints;
-		textureCoords.y += distanceOfTexturePoints;
+		textureCoords.y += distanceOfTexturePoints.y;
 	}
 
 	uint32_t triangleCount = pow(vertsPerSide - 1, 2) * 2;

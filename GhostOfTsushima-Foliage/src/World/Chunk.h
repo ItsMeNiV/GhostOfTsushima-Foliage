@@ -6,7 +6,7 @@ class Chunk
 public:
 	static constexpr uint32_t ChunkSize = 32;
 
-	Chunk(glm::ivec2 position);
+	Chunk(glm::ivec2 position, uint32_t worldWidth);
 
 	Ref<Mesh>& GetMesh() { return m_Mesh; }
 	glm::mat4 GetModelMatrix() { return m_ModelMatrix; }
