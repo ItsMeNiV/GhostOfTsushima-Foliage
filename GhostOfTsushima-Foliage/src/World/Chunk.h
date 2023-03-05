@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/Mesh.h"
+#include "Renderer/TerrainMesh.h"
 
 class Chunk
 {
@@ -8,7 +8,7 @@ public:
 
 	Chunk(glm::ivec2 position, uint32_t worldWidth);
 
-	Ref<Mesh>& GetMesh() { return m_Mesh; }
+	Ref<TerrainMesh>& GetMesh() { return m_Mesh; }
 	glm::mat4 GetModelMatrix() { return m_ModelMatrix; }
 
 	void Draw(Shader& shader)
@@ -22,6 +22,6 @@ public:
 private:
 	glm::ivec2 m_Position;
 	glm::mat4 m_ModelMatrix;
-	Ref<Mesh> m_Mesh;
+	Ref<TerrainMesh> m_Mesh;
 
 };

@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "Mesh.h"
+#include "TerrainMesh.h"
 
-Mesh::Mesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint)
+TerrainMesh::TerrainMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint)
 {
 	glGenVertexArrays(1, &m_VertexArray);
 	glBindVertexArray(m_VertexArray);
@@ -21,7 +21,7 @@ Mesh::Mesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textur
 	Unbind();
 }
 
-void Mesh::generateMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint)
+void TerrainMesh::generateMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint)
 {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;

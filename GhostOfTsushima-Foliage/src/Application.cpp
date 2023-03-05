@@ -38,7 +38,7 @@ void Application::Run()
 {
     Shader terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
     terrainShader.Use();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;

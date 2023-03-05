@@ -6,10 +6,10 @@ struct VertexData
 	glm::vec2 UVCoord;
 };
 
-class Mesh
+class TerrainMesh
 {
 public:
-	Mesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint);
+	TerrainMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, glm::vec2 textureCoordinateEndPoint);
 
 	inline void Bind()
 	{
