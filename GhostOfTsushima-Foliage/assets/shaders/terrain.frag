@@ -1,14 +1,48 @@
 #version 330 core
 
-in vec2 v_TexCoords;
+struct DirectionalLight
+{
+	vec3 Direction;
+
+	vec3 Ambient;
+	vec3 Diffuse;
+	vec3 Specular;
+};
+
+in VS_OUT {
+    vec3 Normal;
+    vec3 FragPos;
+    vec2 TexCoords;
+} fs_in;
 
 out vec4 FragColor;
 
-uniform vec3 color;
 uniform sampler2D diffuseTexture;
+uniform vec3 viewPos;
+
+DirectionalLight light;
 
 void main()
 {
+    light.Direction = vec3(-0.2, -1.0, -0.3);
+    light.Ambient = vec3(0.94, 0.68, 0.44);
+    light.Diffuse = vec3(0.94, 0.68, 0.44);
+    light.Specular = vec3(0.94, 0.68, 0.44);
+
+	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
+    vec3 normal = normalize(fs_in.Normal);
+
+	vec3 lightDir = normalize(-light.Direction);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    vec3 terrainColor = texture(diffuseTexture, fs_in.TexCoords).rgb;
+
+    vec3 ambient = light.Ambient * terrainColor;
+    vec3 diffuse = light.Diffuse * diff * terrainColor;
+
+    vec3 fragResult = (ambient + diffuse) * terrainColor;
 	
-	FragColor = vec4(texture(diffuseTexture, v_TexCoords));
+	FragColor = vec4(fragResult, 1.0);
 }

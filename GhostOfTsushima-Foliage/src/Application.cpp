@@ -57,10 +57,13 @@ void Application::Run()
         terrainShader.Use();
         glm::mat4 viewProjection = m_Camera->GetViewProjection();
         terrainShader.SetMat4("viewProjection", viewProjection);
+        terrainShader.SetVec3("viewPos", m_Camera->GetPosition());
         terrainShader.SetInt("heightmapTexture", 0);
         m_World->GetHeightmapTexture()->ActivateForSlot(0);
-        terrainShader.SetInt("diffuseTexture", 1);
-        m_World->GetDiffuseTexture()->ActivateForSlot(1);
+        terrainShader.SetInt("normalmapTexture", 1);
+        m_World->GetNormalmapTexture()->ActivateForSlot(1);
+        terrainShader.SetInt("diffuseTexture", 2);
+        m_World->GetDiffuseTexture()->ActivateForSlot(2);
         for (auto& chunks : m_World->GetChunks())
         {
             chunks.second->Draw(terrainShader);
@@ -92,7 +95,9 @@ void Application::loadWorld(uint32_t worldNumber)
     switch (worldNumber)
     {
     case 0:
-        m_World = CreateRef<World>("World 0", 5, 5, CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"), CreateRef<Texture>("assets/textures/HillDiffuse.png"), skybox);
+        m_World = CreateRef<World>("World 0", 5, 5, 
+            CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"), CreateRef<Texture>("assets/textures/HillNormalMap.png"),
+            CreateRef<Texture>("assets/textures/HillDiffuse.png"), skybox);
         break;
     default:
         std::cout << "World with the given number " << std::to_string(worldNumber) << " not available!" << std::endl;
