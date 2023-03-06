@@ -1,5 +1,6 @@
 #pragma once
 #include "World/World.h"
+#include "Renderer/Scene.h"
 
 class Application
 {
@@ -21,6 +22,7 @@ private:
 	float m_LastX = m_WindowWidth / 2.0f;
 	float m_LastY = m_WindowHeight / 2.0f;
 
+	Scene m_Scene;
 	Ref<World> m_World;
 	Ref<Camera> m_Camera;
 	Ref<CameraControllerFirstPerson> m_CameraController;

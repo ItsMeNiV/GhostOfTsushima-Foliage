@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Application.h"
 
+#include "Renderer/Renderer.h"
+
 Application::Application()
     : m_Camera(CreateRef<Camera>(glm::vec3(30.0f, 7.0f, 30.0f), m_WindowWidth, m_WindowHeight)),
       m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 10.0f, 0.1f))
@@ -26,6 +28,10 @@ Application::Application()
         });
 
     loadWorld(0);
+    m_Scene.Camera = m_Camera;
+    m_Scene.World = m_World;
+    m_Scene.TerrainShader = CreateRef<Shader>("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
+    m_Scene.SkyboxShader = CreateRef<Shader>("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
 }
 
 Application::~Application()
@@ -36,13 +42,6 @@ Application::~Application()
 
 void Application::Run()
 {
-    Shader skyboxShader("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
-    Shader terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
-
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
     mainLoop
@@ -53,31 +52,7 @@ void Application::Run()
 
         processInput(window, deltaTime);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //Terrain
-        terrainShader.Use();
-        glm::mat4 viewProjection = m_Camera->GetViewProjection();
-        terrainShader.SetMat4("viewProjection", viewProjection);
-        terrainShader.SetVec3("viewPos", m_Camera->GetPosition());
-        terrainShader.SetInt("heightmapTexture", 0);
-        m_World->GetHeightmapTexture()->ActivateForSlot(0);
-        terrainShader.SetInt("normalmapTexture", 1);
-        m_World->GetNormalmapTexture()->ActivateForSlot(1);
-        terrainShader.SetInt("diffuseTexture", 2);
-        m_World->GetDiffuseTexture()->ActivateForSlot(2);
-        for (auto& chunks : m_World->GetChunks())
-        {
-            chunks.second->Draw(terrainShader);
-        }
-
-        //Skybox
-        skyboxShader.Use();
-        skyboxShader.SetMat4("projection", m_Camera->GetProjection());
-        glm::mat4 view = glm::mat4(glm::mat3(m_Camera->GetView()));
-        skyboxShader.SetMat4("view", view);
-        m_World->GetSkybox()->Draw(skyboxShader);
+        Renderer::RenderScene(m_Scene);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -98,7 +73,7 @@ void Application::loadWorld(uint32_t worldNumber)
     switch (worldNumber)
     {
     case 0:
-        m_World = CreateRef<World>("World 0", 5, 5, 
+        m_World = CreateRef<World>("World 0", 10, 10, 
             CreateRef<Texture>("assets/textures/heightmaps/HillHeightMap.png"), CreateRef<Texture>("assets/textures/HillNormalMap.png"),
             CreateRef<Texture>("assets/textures/HillDiffuse.png"), skybox);
         break;

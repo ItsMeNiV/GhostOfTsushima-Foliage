@@ -22,6 +22,7 @@ set(SRC_FILES
  "src/Util/Util.h"
  "src/Renderer/TerrainMesh.h" "src/Renderer/TerrainMesh.cpp"
  "src/World/Skybox.h" "src/World/Skybox.cpp"
+ "src/Renderer/Scene.h"
  )
 
 #GLFW

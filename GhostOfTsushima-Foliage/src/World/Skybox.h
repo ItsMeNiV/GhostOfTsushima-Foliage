@@ -64,16 +64,6 @@ public:
 
     Ref<Texture>& GetTexture() { return m_SkyboxTexture; }
 
-    void Draw(Shader& shader)
-    {
-        glDepthFunc(GL_LEQUAL);
-        Bind();
-        shader.SetInt("skybox", 1);
-        m_SkyboxTexture->ActivateForSlot(1);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDepthFunc(GL_LESS);
-    }
-
 private:
     Ref<Texture> m_SkyboxTexture;
     unsigned int m_VertexArray;
