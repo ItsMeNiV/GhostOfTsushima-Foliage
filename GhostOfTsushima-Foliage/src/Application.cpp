@@ -39,6 +39,9 @@ void Application::Run()
     Shader skyboxShader("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
     Shader terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
