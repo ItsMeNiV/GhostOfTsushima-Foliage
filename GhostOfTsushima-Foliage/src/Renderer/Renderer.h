@@ -7,7 +7,7 @@ class Renderer
 {
 public:
 
-	static void RenderScene(Scene& scene);
+	static void RenderScene(Scene& scene, float time);
 
 private:
 	

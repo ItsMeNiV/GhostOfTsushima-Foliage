@@ -2,14 +2,14 @@
 #include "Util/Texture.h"
 
 static float grassVerts[] = {
-	//Position				//1D-Texture-Coordinate
-	-0.05f, 0.0f,  0.0f,	0.0f,
-	 0.05f, 0.0f,  0.0f,	1.0f,
-	-0.05f, 0.5f,  0.0f,	0.0f,
-	 0.05f, 0.5f,  0.0f,	1.0f,
-	-0.05f, 0.8f,  0.0f,	0.0f,
-	 0.05f, 0.8f,  0.0f,	1.0f,
-	 0.0f,  1.0f,  0.0f,	0.5f
+	//Position				//1D-Texture-Coordinate		//SwayStrength
+	-0.05f, 0.0f,  0.0f,	0.0f,						0.0f,
+	 0.05f, 0.0f,  0.0f,	1.0f,						0.0f,
+	-0.05f, 0.5f,  0.0f,	0.0f,						0.3f,
+	 0.05f, 0.5f,  0.0f,	1.0f,						0.3f,
+	-0.05f, 0.8f,  0.0f,	0.0f,						0.6f,
+	 0.05f, 0.8f,  0.0f,	1.0f,						0.6f,
+	 0.0f,  1.0f,  0.0f,	0.5f,						1.0f
 };
 
 static uint32_t grassIndices[] = {

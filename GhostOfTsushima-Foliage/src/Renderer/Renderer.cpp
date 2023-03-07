@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 
-void Renderer::RenderScene(Scene& scene)
+void Renderer::RenderScene(Scene& scene, float time)
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -38,6 +38,7 @@ void Renderer::RenderScene(Scene& scene)
     scene.GrassbladeShader->SetTexture("grassbladeTexture", 0);
     glm::mat4 model(1.0f);
     scene.GrassbladeShader->SetMat4("model", model);
+    scene.GrassbladeShader->SetFloat("time", time);
     scene.MyGrassMesh->Bind();
     glDrawElements(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0);
 

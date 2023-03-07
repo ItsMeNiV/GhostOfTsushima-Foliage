@@ -55,7 +55,7 @@ void Application::Run()
 
         processInput(window, deltaTime);
 
-        Renderer::RenderScene(m_Scene);
+        Renderer::RenderScene(m_Scene, glfwGetTime());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
