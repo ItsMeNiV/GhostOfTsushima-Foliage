@@ -12,4 +12,6 @@ struct Scene
 
 	Ref<Shader> GrassbladeShader;
 	Ref<GrassMesh> MyGrassMesh;
+
+	glm::vec2* Offsets;
 };

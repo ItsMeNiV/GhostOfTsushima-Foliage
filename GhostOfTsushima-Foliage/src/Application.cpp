@@ -35,6 +35,20 @@ Application::Application()
 
     m_Scene.GrassbladeShader = CreateRef<Shader>("assets/shaders/grass.vert", "assets/shaders/grass.frag");
     m_Scene.MyGrassMesh = CreateRef<GrassMesh>();
+    m_Scene.Offsets = new glm::vec2[1000];
+    float offset = 0.1f;
+    uint32_t x = 0;
+    uint32_t z = 0;
+    for (uint32_t i = 0; i < 1000; i++)
+    {
+        if (x == 100)
+        {
+            x = 0;
+            z++;
+        }
+        m_Scene.Offsets[i] = glm::vec2(x * offset, z * offset);
+        x++;
+    }
 }
 
 Application::~Application()
