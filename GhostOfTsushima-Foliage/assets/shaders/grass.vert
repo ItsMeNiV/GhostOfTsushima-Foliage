@@ -14,7 +14,7 @@ void main()
 {
     v_TexCoord = vec2(aTexCoord, 0.0);
     float trigValue = cos(time * 0.5);
-    trigValue = (trigValue * trigValue * 0.65) * 0.5;
+    trigValue = (trigValue * trigValue * 0.65);
     vec3 position = aPos;
     position.xz += aSwayStrength * trigValue * 0.6;
     gl_Position = viewProjection * model * vec4(position, 1.0);
