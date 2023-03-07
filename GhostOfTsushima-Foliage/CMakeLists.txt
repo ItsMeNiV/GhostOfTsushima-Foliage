@@ -24,6 +24,7 @@ set(SRC_FILES
  "src/World/Skybox.h" "src/World/Skybox.cpp"
  "src/Renderer/Scene.h"
  "src/Renderer/GrassMesh.h" "src/Renderer/GrassMesh.cpp"
+ "src/Renderer/GrassSystem.h" "src/Renderer/GrassSystem.cpp"
 )
 
 #GLFW
