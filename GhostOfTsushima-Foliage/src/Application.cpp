@@ -4,7 +4,7 @@
 #include "Renderer/Renderer.h"
 
 Application::Application()
-    : m_Camera(CreateRef<Camera>(glm::vec3(30.0f, 7.0f, 30.0f), m_WindowWidth, m_WindowHeight)),
+    : m_Camera(CreateRef<Camera>(glm::vec3(0.0f, 0.0f, 0.0f), m_WindowWidth, m_WindowHeight)),
       m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 10.0f, 0.1f))
 {
     initOpenGLWithGLFW(m_WindowTitle, m_WindowWidth, m_WindowHeight);
@@ -32,6 +32,9 @@ Application::Application()
     m_Scene.World = m_World;
     m_Scene.TerrainShader = CreateRef<Shader>("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
     m_Scene.SkyboxShader = CreateRef<Shader>("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
+
+    m_Scene.GrassbladeShader = CreateRef<Shader>("assets/shaders/grass.vert", "assets/shaders/grass.frag");
+    m_Scene.MyGrassMesh = CreateRef<GrassMesh>();
 }
 
 Application::~Application()

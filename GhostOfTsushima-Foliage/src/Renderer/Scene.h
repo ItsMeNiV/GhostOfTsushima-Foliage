@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "World/World.h"
+#include "Renderer/GrassMesh.h"
 
 struct Scene
 {
@@ -8,4 +9,7 @@ struct Scene
 	Ref<Camera> Camera;
 	Ref<Shader> TerrainShader;
 	Ref<Shader> SkyboxShader;
+
+	Ref<Shader> GrassbladeShader;
+	Ref<GrassMesh> MyGrassMesh;
 };
