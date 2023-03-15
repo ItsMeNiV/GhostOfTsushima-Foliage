@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
+#include "GrassSystem.h"
 
 void Renderer::RenderScene(Scene& scene, float time)
 {
@@ -11,7 +12,28 @@ void Renderer::RenderScene(Scene& scene, float time)
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
 
-    //Terrain
+    drawTerrain(scene, time);
+    drawSkybox(scene);
+}
+
+void Renderer::createRenderTiles(Ref<Chunk> chunk)
+{
+    std::vector<Ref<RenderTile>> renderTiles;
+
+    for (uint32_t x = 0; x < Util::GlobalConfig::RenderTilesPerChunkSide; x++)
+    {
+        for (uint32_t y = 0; y < Util::GlobalConfig::RenderTilesPerChunkSide; y++)
+        {
+            glm::ivec2 position = glm::ivec2(x, y);
+            renderTiles.push_back(CreateRef<RenderTile>(chunk, position));
+        }
+    }
+
+    m_ChunkRenderTileMap.insert({ chunk, renderTiles });
+}
+
+void Renderer::drawTerrain(Scene& scene, float time)
+{
     scene.TerrainShader->Use();
     glm::mat4 viewProjection = scene.Camera->GetViewProjection();
     scene.TerrainShader->SetMat4("viewProjection", viewProjection);
@@ -22,16 +44,33 @@ void Renderer::RenderScene(Scene& scene, float time)
     scene.World->GetNormalmapTexture()->ActivateForSlot(1);
     scene.TerrainShader->SetTexture("diffuseTexture", 2);
     scene.World->GetDiffuseTexture()->ActivateForSlot(2);
-    for (auto& chunk : scene.World->GetChunks())
+
+    for (auto& chunkPosPair : scene.World->GetChunks())
     {
-        chunk.second->GetMesh()->Bind();
-        scene.TerrainShader->SetMat4("model", chunk.second->GetModelMatrix());
-        scene.TerrainShader->SetVec3("color", glm::vec3(chunk.second->GetPosition().x / 5.0f, 0.0f, chunk.second->GetPosition().y / 5.0f));
-        glDrawElements(GL_TRIANGLES, chunk.second->GetMesh()->GetIndexCount(), GL_UNSIGNED_INT, 0);
+        auto chunk = chunkPosPair.second;
+
+        // Check if Chunk already had RenderTiles created
+        if (auto foundChunk = m_ChunkRenderTileMap.find(chunk); foundChunk == m_ChunkRenderTileMap.end())
+        {
+            createRenderTiles(chunk);
+        }
+
+        chunk->GetMesh()->Bind();
+        glm::mat4 model = chunk->GetModelMatrix();
+        scene.TerrainShader->SetMat4("model", model);
+        scene.TerrainShader->SetVec3("color", glm::vec3(chunk->GetPosition().x / 5.0f, 0.0f, chunk->GetPosition().y / 5.0f));
+        glDrawElements(GL_TRIANGLES, chunk->GetMesh()->GetIndexCount(), GL_UNSIGNED_INT, 0);
     }
     glDisable(GL_CULL_FACE);
 
     //Grass-System
+    for (auto& chunkPosPair : scene.World->GetChunks())
+    {
+        for(auto renderTile : m_ChunkRenderTileMap.at(chunkPosPair.second))
+            GrassSystem::Instance().DrawRenderTile(renderTile);
+    }
+
+    //TODO REMOVE WHEN GRASS SYSTEM IS IMPLEMENTED
     scene.GrassbladeShader->Use();
     for (unsigned int i = 0; i < 1000; i++)
     {
@@ -47,8 +86,10 @@ void Renderer::RenderScene(Scene& scene, float time)
     scene.GrassbladeShader->SetFloat("time", time);
     scene.MyGrassMesh->Bind();
     glDrawElementsInstanced(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0, 1000);
+}
 
-    //Skybox
+void Renderer::drawSkybox(Scene& scene)
+{
     glDepthFunc(GL_LEQUAL);
     scene.World->GetSkybox()->Bind();
     scene.SkyboxShader->Use();

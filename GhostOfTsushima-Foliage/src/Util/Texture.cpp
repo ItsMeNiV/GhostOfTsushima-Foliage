@@ -11,8 +11,8 @@ Texture::Texture(std::string&& path, bool flipVertically)
 	glGenTextures(1, &m_TextureId);
 	glBindTexture(m_TextureType, m_TextureId);
 
-    glTexParameteri(m_TextureType, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(m_TextureType, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(m_TextureType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(m_TextureType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(m_TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(m_TextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

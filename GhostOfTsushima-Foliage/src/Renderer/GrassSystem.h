@@ -1,4 +1,12 @@
 #pragma once
+#include "RenderTile.h"
+
+struct GrassData
+{
+	uint32_t BladeCount;
+	glm::ivec2* Positions;
+	uint8_t* Hashes;
+};
 
 class GrassSystem
 {
@@ -13,6 +21,11 @@ public:
 		return instance;
 	}
 
+	void DrawRenderTile(Ref<RenderTile> renderTile);
+	Ref<GrassData> GenerateGrassData(RenderTile& renderTile);
+
 private:
-	GrassSystem() {}
+	GrassSystem() : m_ComputeShader(CreateScope<Shader>("assets/shaders/grass_system.comp")) {}
+
+	Scope<Shader> m_ComputeShader;
 };

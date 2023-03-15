@@ -15,7 +15,7 @@ TerrainMesh::TerrainMesh(uint32_t width, glm::vec2 textureCoordStartingPoint, gl
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)0); // 2 Floats (Position X, Z)
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(2 * sizeof(float))); // 2 Floats (UV-Coordinate HeightmapTexture)
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)(offsetof(VertexData, UVCoord))); // 2 Floats (UV-Coordinate HeightmapTexture)
 	glEnableVertexAttribArray(1);
 
 	Unbind();

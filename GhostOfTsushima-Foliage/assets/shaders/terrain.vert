@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aTexCoords;
@@ -16,7 +16,7 @@ uniform sampler2D normalmapTexture;
 
 void main()
 {
-    float height = texture(heightmapTexture, aTexCoords).x * 10;
+    float height = texture(heightmapTexture, aTexCoords).y * 15;
 
     vs_out.TexCoords = aTexCoords;
     vs_out.Normal = texture(normalmapTexture, aTexCoords).rgb;

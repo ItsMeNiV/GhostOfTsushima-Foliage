@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "World/World.h"
 #include "Renderer/GrassMesh.h"
+#include "Renderer/RenderTile.h"
+#include "Util/Util.h"
 
 class Renderer
 {
@@ -19,5 +21,11 @@ public:
 
 private:
 	Renderer() {}
+
+	std::unordered_map<Ref<Chunk>, std::vector<Ref<RenderTile>>, Util::HashChunk, Util::ChunkComparator> m_ChunkRenderTileMap;
+
+	void createRenderTiles(Ref<Chunk> chunk);
+	void drawTerrain(Scene& scene, float time);
+	void drawSkybox(Scene& scene);
 
 };
