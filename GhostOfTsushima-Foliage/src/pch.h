@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 
 #include "OpenGLStarter.h"
 #include "glm/glm.hpp"

@@ -25,6 +25,10 @@ class GrassMesh
 public:
 	GrassMesh();
 
+	inline void BindVertexArray() const
+	{
+		glBindVertexArray(m_VertexArray);
+	}
 	inline void Bind()
 	{
 		glBindVertexArray(m_VertexArray);

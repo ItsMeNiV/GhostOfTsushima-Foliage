@@ -33,8 +33,6 @@ Application::Application()
     m_Scene.TerrainShader = CreateRef<Shader>("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
     m_Scene.SkyboxShader = CreateRef<Shader>("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
 
-    m_Scene.GrassbladeShader = CreateRef<Shader>("assets/shaders/grass.vert", "assets/shaders/grass.frag");
-    m_Scene.MyGrassMesh = CreateRef<GrassMesh>();
     m_Scene.Offsets = new glm::vec2[1000];
     float offset = 0.1f;
     uint32_t x = 0;

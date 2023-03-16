@@ -67,25 +67,8 @@ void Renderer::drawTerrain(Scene& scene, float time)
     for (auto& chunkPosPair : scene.World->GetChunks())
     {
         for(auto renderTile : m_ChunkRenderTileMap.at(chunkPosPair.second))
-            GrassSystem::Instance().DrawRenderTile(renderTile);
+            GrassSystem::Instance().DrawRenderTile(renderTile, scene.Camera, time);
     }
-
-    //TODO REMOVE WHEN GRASS SYSTEM IS IMPLEMENTED
-    scene.GrassbladeShader->Use();
-    for (unsigned int i = 0; i < 1000; i++)
-    {
-        scene.GrassbladeShader->SetVec2(("offsets[" + std::to_string(i) + "]"), scene.Offsets[i]);
-    }
-    scene.GrassbladeShader->SetMat4("viewProjection", viewProjection);
-    scene.MyGrassMesh->GetGrassbladeDiffuseTexture()->ActivateForSlot(0);
-    scene.GrassbladeShader->SetTexture("grassbladeTexture", 0);
-    scene.GrassbladeShader->SetTexture("terrainHeightmapTexture", 1);
-    scene.World->GetHeightmapTexture()->ActivateForSlot(1);
-    glm::mat4 model(1.0f);
-    scene.GrassbladeShader->SetMat4("model", model);
-    scene.GrassbladeShader->SetFloat("time", time);
-    scene.MyGrassMesh->Bind();
-    glDrawElementsInstanced(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0, 1000);
 }
 
 void Renderer::drawSkybox(Scene& scene)

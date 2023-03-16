@@ -9,10 +9,13 @@ class RenderTile
 public:
 	RenderTile(Ref<Chunk> parentChunk, glm::ivec2 position);
 
-	const Ref<GrassData> const GetGrassData() { return m_GrassData; }
+	Ref<GrassData> GetGrassData() { return m_GrassData; }
+	glm::mat4* GetModelMatrices() { return m_ModelMatrices; }
 
 private:
 	Ref<Chunk> m_ParentChunk;
 	glm::ivec2 m_Position;
 	Ref<GrassData> m_GrassData;
+	glm::mat4 m_ModelMatrix;
+	glm::mat4* m_ModelMatrices;
 };
