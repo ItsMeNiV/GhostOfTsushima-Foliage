@@ -7,27 +7,12 @@ GrassSystem::GrassSystem()
 	m_GrassbladeShader(CreateScope<Shader>("assets/shaders/grass.vert", "assets/shaders/grass.frag")),
 	m_GrassbladeMesh(CreateScope<GrassMesh>())
 {
-    uint32_t bladeCount = pow(Util::GlobalConfig::GrassBladesPerRenderTileSide, 2);
-    glm::mat4* dummyData = new glm::mat4[bladeCount];
-    std::fill_n(dummyData, bladeCount, glm::mat4(1.0f));
     m_GrassbladeMesh->BindVertexArray();
-	glGenBuffers(1, &m_GrassBladeMatricesBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeMatricesBuffer);
-    glBufferData(GL_ARRAY_BUFFER, bladeCount * sizeof(glm::mat4), &dummyData[0], GL_DYNAMIC_DRAW);
-	size_t vec4Size = sizeof(glm::vec4);
+	glGenBuffers(1, &m_GrassBladeDataBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeDataBuffer);
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
-
-	glVertexAttribDivisor(3, 1);
-	glVertexAttribDivisor(4, 1);
-	glVertexAttribDivisor(5, 1);
-	glVertexAttribDivisor(6, 1);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glVertexAttribDivisor(3, 1);
 	m_GrassbladeMesh->Unbind();
 }
 
@@ -36,13 +21,14 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     m_GrassbladeShader->Use();
     // Buffer Matrices
     m_GrassbladeMesh->BindVertexArray();
-    glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeMatricesBuffer);
-    glBufferData(GL_ARRAY_BUFFER, renderTile->GetGrassData()->BladeCount * sizeof(glm::mat4), renderTile->GetModelMatrices(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeDataBuffer);
+    glBufferData(GL_ARRAY_BUFFER, renderTile->GetGrassData()->BladeCount * sizeof(glm::vec3), renderTile->GetGrassData()->Positions, GL_DYNAMIC_DRAW);
     m_GrassbladeMesh->Unbind();
 
     // Set uniforms and draw
     glm::mat4 viewProjection = camera->GetViewProjection();
     m_GrassbladeShader->SetMat4("viewProjection", viewProjection);
+    m_GrassbladeShader->SetMat4("renderTileModel", renderTile->GetModelMatrix());
     m_GrassbladeMesh->GetGrassbladeDiffuseTexture()->ActivateForSlot(0);
     m_GrassbladeShader->SetTexture("grassbladeTexture", 0);
     m_GrassbladeShader->SetFloat("time", time);

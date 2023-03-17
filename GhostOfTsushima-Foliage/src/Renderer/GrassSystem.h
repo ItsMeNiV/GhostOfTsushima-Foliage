@@ -39,5 +39,5 @@ private:
 	Scope<Shader> m_ComputeShader;
 	Scope<Shader> m_GrassbladeShader;
 	Scope<GrassMesh> m_GrassbladeMesh;
-	unsigned int m_GrassBladeMatricesBuffer;
+	unsigned int m_GrassBladeDataBuffer;
 };

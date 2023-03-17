@@ -36,6 +36,6 @@ namespace Util {
 		static constexpr uint32_t ChunkSize = 30;
 		static constexpr uint32_t RenderTileSize = 10;
 		static constexpr uint32_t RenderTilesPerChunkSide = ChunkSize / RenderTileSize;
-		static constexpr uint32_t GrassBladesPerRenderTileSide = 30;
+		static constexpr uint32_t GrassBladesPerRenderTileSide = 50;
 	}
 }

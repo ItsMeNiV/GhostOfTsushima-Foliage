@@ -3,12 +3,13 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in float aTexCoord;
 layout (location = 2) in float aSwayStrength;
-layout (location = 3) in mat4 aInstanceMatrix;
+layout (location = 3) in vec3 aInstancePositionoffset;
 
 out vec2 v_TexCoord;
 out float v_PixelHeight;
 
 uniform mat4 viewProjection;
+uniform mat4 renderTileModel;
 uniform float time;
 
 uniform sampler2D terrainHeightmapTexture;
@@ -21,5 +22,5 @@ void main()
     trigValue = (trigValue * trigValue * 0.65);
     vec3 position = aPos;
     position.xz += aSwayStrength * trigValue * 0.6;
-    gl_Position = viewProjection * aInstanceMatrix * vec4(position, 1.0);
+    gl_Position = viewProjection * renderTileModel * vec4(position + aInstancePositionoffset, 1.0);
 }
