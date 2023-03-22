@@ -29,8 +29,12 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     m_GrassbladeMesh->Unbind();
 
     // Set uniforms and draw
-    glm::mat4 viewProjection = camera->GetViewProjection();
-    m_GrassbladeShader->SetMat4("viewProjection", viewProjection);
+    glm::mat4 view = camera->GetView();
+    glm::mat4 projection = camera->GetProjection();
+    glm::vec3 cameraPos = camera->GetPosition();
+    m_GrassbladeShader->SetMat4("view", view);
+    m_GrassbladeShader->SetMat4("projection", projection);
+    m_GrassbladeShader->SetVec3("cameraPos", cameraPos);
     m_GrassbladeShader->SetMat4("renderTileModel", renderTile->GetModelMatrix());
     m_GrassbladeMesh->GetGrassbladeDiffuseTexture()->ActivateForSlot(0);
     m_GrassbladeShader->SetTexture("grassbladeTexture", 0);
