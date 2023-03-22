@@ -1,19 +1,23 @@
 #pragma once
 #include "RenderTile.h"
 #include "GrassMesh.h"
+#include "World/World.h"
+
+struct GrassBlade
+{
+	glm::vec3 Position;
+	uint32_t Hash;
+};
 
 struct GrassData
 {
 	uint32_t BladeCount;
-	glm::vec3* Positions;
-	uint8_t* Hashes;
+	GrassBlade* GrassBlades;
 
 	~GrassData()
 	{
-		if(Positions)
-			delete[] Positions;
-		if(Hashes)
-			delete[] Hashes;
+		if(GrassBlades)
+			delete[] GrassBlades;
 	}
 };
 
@@ -31,7 +35,7 @@ public:
 	}
 
 	void DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera, float time);
-	Ref<GrassData> GenerateGrassData(RenderTile& renderTile);
+	Ref<GrassData> GenerateGrassData(RenderTile& renderTile, Ref<World> world);
 
 private:
 	GrassSystem();

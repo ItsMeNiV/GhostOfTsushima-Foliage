@@ -16,7 +16,7 @@ void Renderer::RenderScene(Scene& scene, float time)
     drawSkybox(scene);
 }
 
-void Renderer::createRenderTiles(Ref<Chunk> chunk)
+void Renderer::createRenderTiles(Ref<Chunk> chunk, Ref<World> world)
 {
     std::vector<Ref<RenderTile>> renderTiles;
 
@@ -25,7 +25,7 @@ void Renderer::createRenderTiles(Ref<Chunk> chunk)
         for (uint32_t y = 0; y < Util::GlobalConfig::RenderTilesPerChunkSide; y++)
         {
             glm::ivec2 position = glm::ivec2(x, y);
-            renderTiles.push_back(CreateRef<RenderTile>(chunk, position));
+            renderTiles.push_back(CreateRef<RenderTile>(chunk, position, world));
         }
     }
 
@@ -52,7 +52,7 @@ void Renderer::drawTerrain(Scene& scene, float time)
         // Check if Chunk already had RenderTiles created
         if (auto foundChunk = m_ChunkRenderTileMap.find(chunk); foundChunk == m_ChunkRenderTileMap.end())
         {
-            createRenderTiles(chunk);
+            createRenderTiles(chunk, scene.World);
         }
 
         chunk->GetMesh()->Bind();

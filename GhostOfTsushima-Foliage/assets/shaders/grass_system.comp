@@ -1,8 +1,77 @@
 #version 430 core
-
+layout(std430) buffer;
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+#define LO = -0.2;
+#define HI = 0.2;
+
+struct GrassBlade {
+	vec3 position;
+	uint hash;
+};
+
+layout(std430, binding = 0) buffer GrassData
+{
+	GrassBlade grassBladeData[];
+} outputData;
+
+uniform vec2 chunkPos;
+uniform vec2 renderTilePos;
+uniform int worldSize;
+uniform int chunkSize;
+uniform int renderTileSize;
+uniform sampler2D terrainHeightmapTexture;
+uniform sampler2D terrainDiffuseTexture;
+
+uint murmurHash12(uvec2 src) {
+    const uint M = 0x5bd1e995u;
+    uint h = 1190494759u;
+    src *= M; src ^= src>>24u; src *= M;
+    h *= M; h ^= src.x; h *= M; h ^= src.y;
+    h ^= h>>13u; h *= M; h ^= h>>15u;
+    return h;
+}
+
+float rand(vec2 co){
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+vec3 rgbToHsv(vec3 c)
+{
+	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, 1.0);
+	vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+	vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+	float d = q.x - min(q.w, q.y);
+	float e = 1.0e-10;
+	return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
 
 void main()
 {
+	float distanceBetweenGrassBlades = float(renderTileSize) / gl_NumWorkGroups.x;
+	vec3 position = vec3(distanceBetweenGrassBlades * gl_GlobalInvocationID.x, 0.0, distanceBetweenGrassBlades * gl_GlobalInvocationID.z);
+	float jitterX = rand(gl_GlobalInvocationID.xz);
+    float jitterZ = rand(gl_GlobalInvocationID.xy);
+	position.x += jitterX;
+	position.z += jitterZ;
 
+	float textureCoordDistancePerUnit = 1.0 / ((worldSize) * (chunkSize));
+	vec2 unitPos = (renderTilePos * renderTileSize) + (chunkPos * chunkSize) + position.xz;
+	vec2 textureCoordinate = textureCoordDistancePerUnit * unitPos;
+	position.y = texture(terrainHeightmapTexture, textureCoordinate).y * 15;
+	vec3 hsvValue = rgbToHsv(texture(terrainDiffuseTexture, textureCoordinate).rgb);
+
+	bool shouldDrawGrassblade = hsvValue.x >= 0.2 && hsvValue.x <= 0.43;
+	
+	if(shouldDrawGrassblade)
+	{
+		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].position = position;
+		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].hash = murmurHash12(gl_GlobalInvocationID.xz);
+	}
+	else
+	{
+		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].position = vec3(0.0, -5.0, 0.0);
+		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].hash = 0;
+	}
 }

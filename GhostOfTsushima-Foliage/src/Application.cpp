@@ -8,6 +8,10 @@ Application::Application()
       m_CameraController(CreateRef<CameraControllerFirstPerson>(m_Camera.get(), 10.0f, 0.1f))
 {
     initOpenGLWithGLFW(m_WindowTitle, m_WindowWidth, m_WindowHeight);
+
+    //glEnable(GL_DEBUG_OUTPUT);
+    //glDebugMessageCallback(MessageCallback, 0);
+
     glEnable(GL_DEPTH_TEST);
     glfwSwapInterval(0);
     disableCursor();

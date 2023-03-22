@@ -11,8 +11,11 @@ GrassSystem::GrassSystem()
 	glGenBuffers(1, &m_GrassBladeDataBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeDataBuffer);
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(GrassBlade), (void*)0);
+    glEnableVertexAttribArray(4);
+	glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(GrassBlade), (void*)(offsetof(GrassBlade, Hash)));
     glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
 	m_GrassbladeMesh->Unbind();
 }
 
@@ -22,7 +25,7 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     // Buffer Matrices
     m_GrassbladeMesh->BindVertexArray();
     glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeDataBuffer);
-    glBufferData(GL_ARRAY_BUFFER, renderTile->GetGrassData()->BladeCount * sizeof(glm::vec3), renderTile->GetGrassData()->Positions, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, renderTile->GetGrassData()->BladeCount * sizeof(GrassBlade), renderTile->GetGrassData()->GrassBlades, GL_DYNAMIC_DRAW);
     m_GrassbladeMesh->Unbind();
 
     // Set uniforms and draw
@@ -37,14 +40,42 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     m_GrassbladeMesh->Unbind();
 }
 
-Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile)
+Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World> world)
 {
     Ref<GrassData> data = CreateRef<GrassData>();
     data->BladeCount = pow(Util::GlobalConfig::GrassBladesPerRenderTileSide, 2);
-    data->Hashes = new uint8_t[data->BladeCount];
-    data->Positions = new glm::vec3[data->BladeCount];
+    data->GrassBlades = new GrassBlade[data->BladeCount];
 
-    std::fill_n(data->Hashes, data->BladeCount, 1);
+    m_ComputeShader->Use();
+    unsigned int ssbo;
+    glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    int ssbo_binding = 0;
+    m_ComputeShader->SetShaderStorageBlockBinding(0, ssbo_binding);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding, ssbo);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, data->BladeCount * sizeof(GrassBlade), 0, GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+
+    m_ComputeShader->SetVec2("chunkPos", renderTile.GetParentChunk()->GetPosition());
+    m_ComputeShader->SetVec2("renderTilePos", renderTile.GetPosition());
+    m_ComputeShader->SetInt("worldSize", world->GetWidth());
+    m_ComputeShader->SetInt("chunkSize", Util::GlobalConfig::ChunkSize);
+    m_ComputeShader->SetInt("renderTileSize", Util::GlobalConfig::RenderTileSize);
+    m_ComputeShader->SetTexture("terrainHeightmapTexture", 0);
+    world->GetHeightmapTexture()->ActivateForSlot(0);
+    m_ComputeShader->SetTexture("terrainDiffuseTexture", 1);
+    world->GetDiffuseTexture()->ActivateForSlot(1);
+
+    glDispatchCompute(Util::GlobalConfig::GrassBladesPerRenderTileSide, 1, Util::GlobalConfig::GrassBladesPerRenderTileSide);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
+    memcpy(data->GrassBlades, p, data->BladeCount * sizeof(GrassBlade));
+
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glDeleteBuffers(1, &ssbo);
+
+    /*
     uint32_t i = 0;
     float distanceBetweenGrassBlades = float(Util::GlobalConfig::RenderTileSize) / float(Util::GlobalConfig::GrassBladesPerRenderTileSide);
     glm::vec3 position(0.0f, 4.0f, 0.0f);
@@ -57,13 +88,13 @@ Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile)
         {
             float jitterX = LO + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (HI - LO));
             float jitterZ = LO + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (HI - LO));
-            data->Positions[i] = position;
-            data->Positions[i].x += jitterX;
-            data->Positions[i].z += jitterZ;
+            data->GrassBlades[i].Position = position;
+            data->GrassBlades[i].Position.x += jitterX;
+            data->GrassBlades[i].Position.z += jitterZ;
             i++;
             position.x += distanceBetweenGrassBlades;
         }
         position.z += distanceBetweenGrassBlades;
-    }
+    }*/
 	return data;
 }

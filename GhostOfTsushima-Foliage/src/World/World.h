@@ -15,6 +15,8 @@ public:
 	Ref<Texture>& GetNormalmapTexture() { return m_NormalmapTexture; }
 	Ref<Texture>& GetDiffuseTexture() { return m_DiffuseTexture; }
 	Ref<Skybox>& GetSkybox() { return m_Skybox; }
+	uint32_t GetWidth() { return m_Width; }
+	uint32_t GetHeight() { return m_Height; }
 
 private:
 	std::string m_Name;

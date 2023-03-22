@@ -24,7 +24,7 @@ private:
 
 	std::unordered_map<Ref<Chunk>, std::vector<Ref<RenderTile>>, Util::HashChunk, Util::ChunkComparator> m_ChunkRenderTileMap;
 
-	void createRenderTiles(Ref<Chunk> chunk);
+	void createRenderTiles(Ref<Chunk> chunk, Ref<World> world);
 	void drawTerrain(Scene& scene, float time);
 	void drawSkybox(Scene& scene);
 
