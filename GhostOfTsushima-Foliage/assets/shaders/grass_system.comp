@@ -38,29 +38,36 @@ float rand(vec2 co){
 
 vec3 rgbToHsv(vec3 c)
 {
-	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, 1.0);
-	vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-	vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
 
-	float d = q.x - min(q.w, q.y);
-	float e = 1.0e-10;
-	return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
 void main()
 {
+	float textureCoordDistancePerUnit = 1.0 / ((worldSize-1) * (chunkSize-1));
 	float distanceBetweenGrassBlades = float(renderTileSize) / gl_NumWorkGroups.x;
+
 	vec3 position = vec3(distanceBetweenGrassBlades * gl_GlobalInvocationID.x, 0.0, distanceBetweenGrassBlades * gl_GlobalInvocationID.z);
 	float jitterX = rand(gl_GlobalInvocationID.xz);
     float jitterZ = rand(gl_GlobalInvocationID.xy);
 	position.x += jitterX;
 	position.z += jitterZ;
+	vec2 unitPos = (renderTilePos * (renderTileSize-1)) + (chunkPos * (chunkSize-1)) + position.xz;
+	vec2 positionCorrection = max(0.0 - unitPos, 0.0);
+	position.x += positionCorrection.x;
+	position.z += positionCorrection.y;
+	unitPos += positionCorrection;
 
-	float textureCoordDistancePerUnit = 1.0 / ((worldSize) * (chunkSize));
-	vec2 unitPos = (renderTilePos * renderTileSize) + (chunkPos * chunkSize) + position.xz;
 	vec2 textureCoordinate = textureCoordDistancePerUnit * unitPos;
 	position.y = texture(terrainHeightmapTexture, textureCoordinate).y * 15;
 	vec3 hsvValue = rgbToHsv(texture(terrainDiffuseTexture, textureCoordinate).rgb);
+
+
 
 	bool shouldDrawGrassblade = hsvValue.x >= 0.2 && hsvValue.x <= 0.43;
 	

@@ -4,6 +4,16 @@
 
 void Renderer::RenderScene(Scene& scene, float time)
 {
+    glEnable(GL_DEPTH_TEST);
+
+    if (m_Framebuffer->GetWidth() != scene.Camera->GetCameraWidth() || m_Framebuffer->GetHeight() != scene.Camera->GetCameraHeight())
+    {
+        m_MultisampledFramebuffer = CreateScope<Framebuffer>(scene.Camera->GetCameraWidth(), scene.Camera->GetCameraHeight(), Util::GlobalConfig::MSAASamples);
+        m_Framebuffer = CreateScope<Framebuffer>(scene.Camera->GetCameraWidth(), scene.Camera->GetCameraHeight());
+    }
+
+    m_MultisampledFramebuffer->Bind();
+
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -14,6 +24,15 @@ void Renderer::RenderScene(Scene& scene, float time)
 
     drawTerrain(scene, time);
     drawSkybox(scene);
+    m_MultisampledFramebuffer->Unbind();
+
+    m_MultisampledFramebuffer->BlitFramebuffer(m_Framebuffer->GetId());
+    m_FullscreenShader->Use();
+    m_FullscreenShader->SetInt("screenTexture", 0);
+    m_Framebuffer->GetTextureColorBuffer()->ActivateForSlot(0);
+    glBindVertexArray(m_QuadVertexArray);
+    glDisable(GL_DEPTH_TEST);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::createRenderTiles(Ref<Chunk> chunk, Ref<World> world)

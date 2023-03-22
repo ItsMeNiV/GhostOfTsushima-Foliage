@@ -12,7 +12,6 @@ Application::Application()
     //glEnable(GL_DEBUG_OUTPUT);
     //glDebugMessageCallback(MessageCallback, 0);
 
-    glEnable(GL_DEPTH_TEST);
     glfwSwapInterval(0);
     disableCursor();
     glfwSetWindowUserPointer(window, reinterpret_cast<void*>(this));

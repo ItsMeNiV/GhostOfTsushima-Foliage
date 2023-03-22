@@ -66,6 +66,20 @@ Texture::Texture(std::vector<std::string> paths, bool flipVertically)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
+Texture::Texture(int width, int height, int sampleCount)
+    : m_TextureType(sampleCount > 1 ? TextureType::TEXTURE_2D_MULTI : TextureType::TEXTURE_2D), m_TextureId(UINT_MAX)
+{
+    glGenTextures(1, &m_TextureId);
+    glBindTexture(m_TextureType, m_TextureId);
+    if (sampleCount > 1)
+        glTexImage2DMultisample(m_TextureType, sampleCount, GL_RGB, width, height, GL_TRUE);
+    else
+        glTexImage2D(m_TextureType, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
+    glTexParameteri(m_TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(m_TextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(m_TextureType, 0);
+}
+
 Texture::~Texture()
 {
     glDeleteTextures(1, &m_TextureId);
