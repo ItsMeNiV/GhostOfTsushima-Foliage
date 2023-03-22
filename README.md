@@ -3,8 +3,8 @@ Replication of the amazing Grass/Foliage Rendering in Ghost of Tsushima using Op
 
 ***
 
-## Example Render
-![Screenshot](Render.png?raw=true "Example render")
+## Render Showcase
+![Showcase](Showcase.gif?raw=true "Render Showcase")
 
 ***
 
