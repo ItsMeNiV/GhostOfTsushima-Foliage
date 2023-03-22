@@ -48,7 +48,6 @@ Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World>
 {
     Ref<GrassData> data = CreateRef<GrassData>();
     data->BladeCount = pow(Util::GlobalConfig::GrassBladesPerRenderTileSide, 2);
-    data->GrassBlades = new GrassBlade[data->BladeCount];
 
     m_ComputeShader->Use();
     unsigned int ssbo;
@@ -72,33 +71,20 @@ Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World>
     glDispatchCompute(Util::GlobalConfig::GrassBladesPerRenderTileSide, 1, Util::GlobalConfig::GrassBladesPerRenderTileSide);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
+    std::vector<GrassBlade> tempBlades(data->BladeCount);
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
-    memcpy(data->GrassBlades, p, data->BladeCount * sizeof(GrassBlade));
-
+    memcpy(tempBlades.data(), p, data->BladeCount * sizeof(GrassBlade));
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glDeleteBuffers(1, &ssbo);
 
-    /*
-    uint32_t i = 0;
-    float distanceBetweenGrassBlades = float(Util::GlobalConfig::RenderTileSize) / float(Util::GlobalConfig::GrassBladesPerRenderTileSide);
-    glm::vec3 position(0.0f, 4.0f, 0.0f);
-    float LO = -0.2f;
-    float HI = 0.2f;
-    for (uint32_t z = 0; z < Util::GlobalConfig::GrassBladesPerRenderTileSide; z++)
-    {
-        position.x = 0.0f;
-        for (uint32_t x = 0; x < Util::GlobalConfig::GrassBladesPerRenderTileSide; x++)
-        {
-            float jitterX = LO + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (HI - LO));
-            float jitterZ = LO + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (HI - LO));
-            data->GrassBlades[i].Position = position;
-            data->GrassBlades[i].Position.x += jitterX;
-            data->GrassBlades[i].Position.z += jitterZ;
-            i++;
-            position.x += distanceBetweenGrassBlades;
-        }
-        position.z += distanceBetweenGrassBlades;
-    }*/
+    tempBlades.erase(
+        std::remove_if(tempBlades.begin(), tempBlades.end(),
+            [](GrassBlade b) { return b.Position.y == -99.0f; }),
+        tempBlades.end());
+    data->BladeCount = tempBlades.size();
+    data->GrassBlades = new GrassBlade[data->BladeCount];
+    memcpy(data->GrassBlades, tempBlades.data(), data->BladeCount * sizeof(GrassBlade));
+
 	return data;
 }

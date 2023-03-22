@@ -23,20 +23,22 @@ void main()
     v_TexCoord = vec2(aTexCoord, 0.0);
     v_PixelHeight = aPos.y;
     
-    vec4 vertexPos = renderTileModel * vec4(aPos + aInstancePositionoffset, 1.0);
+    vec4 vertexWorldPos = renderTileModel * vec4(aPos + aInstancePositionoffset, 1.0);
 
-    vec3 fwd = normalize(vec3(vertexPos) - cameraPos);
+    //Rotate towards camera
+    vec3 cameraToVertex = normalize(vec3(vertexWorldPos) - cameraPos);
     vec3 up = vec3(0,1,0);
-    vec3 right = normalize(cross(fwd, up));
-    fwd = normalize(cross(up, right)); // updating fwd to make sure its perpendicular to both up and right
-    mat3 rotationMatrix = mat3(right, up, fwd);
+    vec3 right = normalize(cross(cameraToVertex, up));
+    cameraToVertex = normalize(cross(up, right));
+    mat3 rotationMatrix = mat3(right, up, cameraToVertex);
 
+    // Swaying
     float trigValue = cos(((aInstanceHash / 10000) + time) * 0.5);
     trigValue = (trigValue * trigValue * 0.65);
     vec3 position = aPos;
     position.xz += aSwayStrength * trigValue * 0.6 * windDirection;
 
-    vec4 worldSpacePos = projection * view * renderTileModel * vec4((rotationMatrix * position) + aInstancePositionoffset, 1.0);
+    vec4 screenSpacePos = projection * view * renderTileModel * vec4((rotationMatrix * position) + aInstancePositionoffset, 1.0);
 
-    gl_Position = worldSpacePos;
+    gl_Position = screenSpacePos;
 }
