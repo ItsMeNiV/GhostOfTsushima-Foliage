@@ -13,9 +13,12 @@ GrassSystem::GrassSystem()
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(GrassBlade), (void*)0);
     glEnableVertexAttribArray(4);
-	glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, sizeof(GrassBlade), (void*)(offsetof(GrassBlade, Hash)));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(GrassBlade), (void*)(offsetof(GrassBlade, Height)));
+    glEnableVertexAttribArray(5);
+	glVertexAttribIPointer(5, 1, GL_UNSIGNED_INT, sizeof(GrassBlade), (void*)(offsetof(GrassBlade, Hash)));
     glVertexAttribDivisor(3, 1);
     glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
 	m_GrassbladeMesh->Unbind();
 }
 

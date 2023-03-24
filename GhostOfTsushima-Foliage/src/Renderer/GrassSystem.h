@@ -6,7 +6,9 @@
 struct GrassBlade
 {
 	glm::vec3 Position;
-	uint32_t Hash;
+	float Height;
+	GLuint Hash;
+	float __padding[3];
 };
 
 struct GrassData

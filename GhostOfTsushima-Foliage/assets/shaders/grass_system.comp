@@ -7,6 +7,7 @@ layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 struct GrassBlade {
 	vec3 position;
+	float height;
 	uint hash;
 };
 
@@ -71,14 +72,17 @@ void main()
 
 	bool shouldDrawGrassblade = hsvValue.x >= 0.2 && hsvValue.x <= 0.43 && hsvValue.y >= 0.3;
 	
+	uint index = gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x;
 	if(shouldDrawGrassblade)
 	{
-		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].position = position;
-		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].hash = murmurHash12(gl_GlobalInvocationID.xz);
+		outputData.grassBladeData[index].position = position;
+		outputData.grassBladeData[index].height = min(rand(gl_GlobalInvocationID.xz) + 1.0, 1.5);
+		outputData.grassBladeData[index].hash = murmurHash12(gl_GlobalInvocationID.xz);
 	}
 	else
 	{
-		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].position = vec3(0.0, -99.0, 0.0);
-		outputData.grassBladeData[gl_GlobalInvocationID.z * gl_NumWorkGroups.x + gl_GlobalInvocationID.x].hash = 0;
+		outputData.grassBladeData[index].position = vec3(0.0, -99.0, 0.0);
+		outputData.grassBladeData[index].height = 0.0;
+		outputData.grassBladeData[index].hash = 0;
 	}
 }
