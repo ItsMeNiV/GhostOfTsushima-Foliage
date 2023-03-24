@@ -50,12 +50,13 @@ void Renderer::createRenderTiles(Ref<Chunk> chunk, Ref<World> world)
 
 void Renderer::drawTerrain(Scene& scene, float time)
 {
+    scene.TerrainShader->Use();
+    glm::mat4 viewProjection = scene.Camera->GetViewProjection();
+    scene.TerrainShader->SetMat4("viewProjection", viewProjection);
+    scene.TerrainShader->SetVec3("viewPos", scene.Camera->GetPosition());
     for (auto& chunkPosPair : scene.World->GetChunks())
     {
         scene.TerrainShader->Use();
-        glm::mat4 viewProjection = scene.Camera->GetViewProjection();
-        scene.TerrainShader->SetMat4("viewProjection", viewProjection);
-        scene.TerrainShader->SetVec3("viewPos", scene.Camera->GetPosition());
         scene.TerrainShader->SetTexture("heightmapTexture", 0);
         scene.World->GetHeightmapTexture()->ActivateForSlot(0);
         scene.TerrainShader->SetTexture("normalmapTexture", 1);

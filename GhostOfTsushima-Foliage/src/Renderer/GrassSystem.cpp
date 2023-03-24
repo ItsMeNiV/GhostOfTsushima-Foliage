@@ -28,7 +28,11 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     // Buffer Matrices
     m_GrassbladeMesh->BindVertexArray();
     glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeDataBuffer);
-    glBufferData(GL_ARRAY_BUFFER, renderTile->GetGrassData()->BladeCount * sizeof(GrassBlade), renderTile->GetGrassData()->GrassBlades, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_COPY_READ_BUFFER, renderTile->GetGrassInstanceBuffer());
+    void* dataPtr = glMapBuffer(GL_COPY_READ_BUFFER, GL_READ_ONLY);
+    glBufferData(GL_ARRAY_BUFFER, renderTile->GetGrassBladeCount() * sizeof(GrassBlade), dataPtr, GL_DYNAMIC_DRAW);
+    glUnmapBuffer(GL_COPY_READ_BUFFER);
+    glBindBuffer(GL_COPY_READ_BUFFER, 0);
     m_GrassbladeMesh->Unbind();
 
     // Set uniforms and draw
@@ -43,14 +47,13 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     m_GrassbladeShader->SetTexture("grassbladeTexture", 0);
     m_GrassbladeShader->SetFloat("time", time);
     m_GrassbladeMesh->BindVertexArray();
-    glDrawElementsInstanced(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0, renderTile->GetGrassData()->BladeCount);
+    glDrawElementsInstanced(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0, renderTile->GetGrassBladeCount());
     m_GrassbladeMesh->Unbind();
 }
 
-Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World> world)
+void GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World> world)
 {
-    Ref<GrassData> data = CreateRef<GrassData>();
-    data->BladeCount = pow(Util::GlobalConfig::GrassBladesPerRenderTileSide, 2);
+    uint32_t bladeCount = pow(Util::GlobalConfig::GrassBladesPerRenderTileSide, 2);
 
     m_ComputeShader->Use();
     unsigned int ssbo;
@@ -59,7 +62,7 @@ Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World>
     int ssbo_binding = 0;
     m_ComputeShader->SetShaderStorageBlockBinding(0, ssbo_binding);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo_binding, ssbo);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, data->BladeCount * sizeof(GrassBlade), 0, GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, bladeCount * sizeof(GrassBlade), 0, GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
 
     m_ComputeShader->SetVec2("chunkPos", renderTile.GetParentChunk()->GetPosition());
     m_ComputeShader->SetVec2("renderTilePos", renderTile.GetPosition());
@@ -74,9 +77,9 @@ Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World>
     glDispatchCompute(Util::GlobalConfig::GrassBladesPerRenderTileSide, 1, Util::GlobalConfig::GrassBladesPerRenderTileSide);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    std::vector<GrassBlade> tempBlades(data->BladeCount);
+    std::vector<GrassBlade> tempBlades(bladeCount);
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
-    memcpy(tempBlades.data(), p, data->BladeCount * sizeof(GrassBlade));
+    memcpy(tempBlades.data(), p, bladeCount * sizeof(GrassBlade));
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glDeleteBuffers(1, &ssbo);
@@ -85,9 +88,9 @@ Ref<GrassData> GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World>
         std::remove_if(tempBlades.begin(), tempBlades.end(),
             [](GrassBlade b) { return b.Position.y == -99.0f; }),
         tempBlades.end());
-    data->BladeCount = tempBlades.size();
-    data->GrassBlades = new GrassBlade[data->BladeCount];
-    memcpy(data->GrassBlades, tempBlades.data(), data->BladeCount * sizeof(GrassBlade));
 
-	return data;
+    renderTile.SetGrassBladeCount(tempBlades.size());
+    glBindBuffer(GL_ARRAY_BUFFER, renderTile.GetGrassInstanceBuffer());
+    glBufferData(GL_ARRAY_BUFFER, bladeCount * sizeof(GrassBlade), tempBlades.data(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

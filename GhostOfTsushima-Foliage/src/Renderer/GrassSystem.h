@@ -37,7 +37,7 @@ public:
 	}
 
 	void DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera, float time);
-	Ref<GrassData> GenerateGrassData(RenderTile& renderTile, Ref<World> world);
+	void GenerateGrassData(RenderTile& renderTile, Ref<World> world);
 
 private:
 	GrassSystem();
@@ -46,4 +46,6 @@ private:
 	Scope<Shader> m_GrassbladeShader;
 	Scope<GrassMesh> m_GrassbladeMesh;
 	unsigned int m_GrassBladeDataBuffer;
+
+	void createInstanceBuffer();
 };
