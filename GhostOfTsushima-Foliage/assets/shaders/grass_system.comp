@@ -1,5 +1,4 @@
 #version 430 core
-layout(std430) buffer;
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 #define LO = -0.2;

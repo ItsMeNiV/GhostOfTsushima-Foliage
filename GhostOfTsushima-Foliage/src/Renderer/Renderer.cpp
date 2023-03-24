@@ -18,9 +18,6 @@ void Renderer::RenderScene(Scene& scene, float time)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
 
     drawTerrain(scene, time);
     drawSkybox(scene);
@@ -53,20 +50,27 @@ void Renderer::createRenderTiles(Ref<Chunk> chunk, Ref<World> world)
 
 void Renderer::drawTerrain(Scene& scene, float time)
 {
-    scene.TerrainShader->Use();
-    glm::mat4 viewProjection = scene.Camera->GetViewProjection();
-    scene.TerrainShader->SetMat4("viewProjection", viewProjection);
-    scene.TerrainShader->SetVec3("viewPos", scene.Camera->GetPosition());
-    scene.TerrainShader->SetTexture("heightmapTexture", 0);
-    scene.World->GetHeightmapTexture()->ActivateForSlot(0);
-    scene.TerrainShader->SetTexture("normalmapTexture", 1);
-    scene.World->GetNormalmapTexture()->ActivateForSlot(1);
-    scene.TerrainShader->SetTexture("diffuseTexture", 2);
-    scene.World->GetDiffuseTexture()->ActivateForSlot(2);
-
     for (auto& chunkPosPair : scene.World->GetChunks())
     {
+        scene.TerrainShader->Use();
+        glm::mat4 viewProjection = scene.Camera->GetViewProjection();
+        scene.TerrainShader->SetMat4("viewProjection", viewProjection);
+        scene.TerrainShader->SetVec3("viewPos", scene.Camera->GetPosition());
+        scene.TerrainShader->SetTexture("heightmapTexture", 0);
+        scene.World->GetHeightmapTexture()->ActivateForSlot(0);
+        scene.TerrainShader->SetTexture("normalmapTexture", 1);
+        scene.World->GetNormalmapTexture()->ActivateForSlot(1);
+        scene.TerrainShader->SetTexture("diffuseTexture", 2);
+        scene.World->GetDiffuseTexture()->ActivateForSlot(2);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
+
         auto chunk = chunkPosPair.second;
+
+        //Check if chunk is on camera frustum
+        if (!chunk->GetBoundingBox()->IsOnFrustum(scene.Camera->GetCameraFrustum()))
+            continue;
 
         // Check if Chunk already had RenderTiles created
         if (auto foundChunk = m_ChunkRenderTileMap.find(chunk); foundChunk == m_ChunkRenderTileMap.end())
@@ -79,19 +83,23 @@ void Renderer::drawTerrain(Scene& scene, float time)
         scene.TerrainShader->SetMat4("model", model);
         scene.TerrainShader->SetVec3("color", glm::vec3(chunk->GetPosition().x / 5.0f, 0.0f, chunk->GetPosition().y / 5.0f));
         glDrawElements(GL_TRIANGLES, chunk->GetMesh()->GetIndexCount(), GL_UNSIGNED_INT, 0);
-    }
-    glDisable(GL_CULL_FACE);
 
-    //Grass-System
-    for (auto& chunkPosPair : scene.World->GetChunks())
-    {
-        for(auto renderTile : m_ChunkRenderTileMap.at(chunkPosPair.second))
+        //Grass-System
+        glDisable(GL_CULL_FACE);
+        for (auto renderTile : m_ChunkRenderTileMap.at(chunk))
+        {
+            if (!renderTile->GetBoundingBox()->IsOnFrustum(scene.Camera->GetCameraFrustum()))
+                continue;
+
             GrassSystem::Instance().DrawRenderTile(renderTile, scene.Camera, time);
+        }
     }
+
 }
 
 void Renderer::drawSkybox(Scene& scene)
 {
+    glDisable(GL_CULL_FACE);
     glDepthFunc(GL_LEQUAL);
     scene.World->GetSkybox()->Bind();
     scene.SkyboxShader->Use();

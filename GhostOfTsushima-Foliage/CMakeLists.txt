@@ -27,6 +27,7 @@ set(SRC_FILES
  "src/Renderer/GrassSystem.h" "src/Renderer/GrassSystem.cpp"
  "src/Renderer/RenderTile.h" "src/Renderer/RenderTile.cpp"
  "src/Util/Framebuffer.h" "src/Util/Framebuffer.cpp"
+ "src/Util/AABB.h" "src/Util/AABB.cpp"
 )
 
 #GLFW

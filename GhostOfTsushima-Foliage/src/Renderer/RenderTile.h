@@ -14,10 +14,12 @@ public:
 	glm::mat4& GetModelMatrix() { return m_ModelMatrix; }
 	glm::ivec2 GetPosition() { return m_Position; }
 	Ref<Chunk> GetParentChunk() { return m_ParentChunk; }
+	Ref<AABB> GetBoundingBox() { return m_BoundingBox; }
 
 private:
 	Ref<Chunk> m_ParentChunk;
 	glm::ivec2 m_Position;
 	Ref<GrassData> m_GrassData;
 	glm::mat4 m_ModelMatrix;
+	Ref<AABB> m_BoundingBox;
 };
