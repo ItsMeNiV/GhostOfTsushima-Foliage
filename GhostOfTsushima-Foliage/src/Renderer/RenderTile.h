@@ -13,7 +13,6 @@ public:
 	glm::mat4& GetModelMatrix() { return m_ModelMatrix; }
 	glm::ivec2 GetPosition() { return m_Position; }
 	Ref<Chunk> GetParentChunk() { return m_ParentChunk; }
-	Ref<AABB> GetBoundingBox() { return m_BoundingBox; }
 	unsigned int GetGrassInstanceBuffer() { return m_GrassInstanceBuffer; }
 	uint32_t GetGrassBladeCount() { return m_GrassBladeCount; }
 	void SetGrassBladeCount(uint32_t count) { m_GrassBladeCount = count; }
@@ -22,7 +21,6 @@ private:
 	Ref<Chunk> m_ParentChunk;
 	glm::ivec2 m_Position;
 	glm::mat4 m_ModelMatrix;
-	Ref<AABB> m_BoundingBox;
 
 	uint32_t m_GrassBladeCount;
 	unsigned int m_GrassInstanceBuffer;
