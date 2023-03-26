@@ -1,0 +1,136 @@
+#version 430 core
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer OutputData
+{
+	int renderChunkPositions[];
+} outputData;
+
+struct Plane
+{
+    vec3 normal; // unit vector
+    float distance; // Distance with origin
+};
+
+Plane createPlane(const vec3 p1, const vec3 norm)
+{
+    Plane plane;
+    plane.normal = normalize(norm);
+    plane.distance = dot(plane.normal, p1);
+    return plane;
+}
+float getSignedDistanceToPlane(const Plane plane, const vec3 point)
+{
+    return dot(plane.normal, point) - plane.distance;
+}
+
+struct Frustum
+{
+    Plane topFace;
+    Plane bottomFace;
+
+    Plane rightFace;
+    Plane leftFace;
+
+    Plane farFace;
+    Plane nearFace;
+};
+
+struct AABB
+{
+    vec3 center;
+	vec3 extents;
+};
+AABB createAABB(const vec3 min, const vec3 max)
+{
+    AABB boundingBox;
+    boundingBox.center = (max + min) * 0.5;
+    boundingBox.extents = vec3(max.x - boundingBox.center.x, max.y - boundingBox.center.y, max.z - boundingBox.center.z);
+    return boundingBox;
+}
+bool aabbIsOnOrForwardPlane(AABB boundingBox, const Plane plane)
+{
+	const float r = boundingBox.extents.x * abs(plane.normal.x) + boundingBox.extents.y * abs(plane.normal.y) +
+		boundingBox.extents.z * abs(plane.normal.z);
+
+	return -r <= getSignedDistanceToPlane(plane, boundingBox.center);
+}
+
+bool aabbIsOnFrustum(AABB boundingBox, const Frustum camFrustum)
+{
+	return (aabbIsOnOrForwardPlane(boundingBox, camFrustum.leftFace) &&
+		aabbIsOnOrForwardPlane(boundingBox, camFrustum.rightFace) &&
+		aabbIsOnOrForwardPlane(boundingBox, camFrustum.topFace) &&
+		aabbIsOnOrForwardPlane(boundingBox, camFrustum.bottomFace) &&
+		aabbIsOnOrForwardPlane(boundingBox, camFrustum.nearFace) &&
+		aabbIsOnOrForwardPlane(boundingBox, camFrustum.farFace));
+}
+
+uniform int chunkSize;
+uniform int renderTileSize;
+//To create frustum
+uniform float cameraWidth;
+uniform float cameraHeight;
+uniform vec3 cameraFront;
+uniform vec3 cameraRight;
+uniform vec3 cameraUp;
+uniform vec3 cameraPos;
+
+Frustum createCameraFrustum()
+{
+    Frustum cameraFrustum;
+    float aspect = cameraWidth / cameraHeight;
+    float zNear = 0.1;
+    float zFar = 1000.0;
+
+    const float halfVSide = zFar * tan(radians(45.0) * 0.5);
+    const float halfHSide = halfVSide * aspect;
+    const vec3 frontMultFar = zFar * cameraFront;
+
+    cameraFrustum.nearFace = createPlane(cameraPos + zNear * cameraFront, cameraFront);
+    cameraFrustum.farFace = createPlane(cameraPos + frontMultFar, -cameraFront);
+    cameraFrustum.rightFace = createPlane(cameraPos, cross(frontMultFar - cameraRight * halfHSide, cameraUp));
+    cameraFrustum.leftFace = createPlane(cameraPos, cross(cameraUp, frontMultFar + cameraRight * halfHSide));
+    cameraFrustum.topFace = createPlane(cameraPos, cross(cameraRight, frontMultFar - cameraUp * halfVSide));
+    cameraFrustum.bottomFace = createPlane(cameraPos, cross(frontMultFar + cameraUp * halfVSide, cameraRight));
+
+    return cameraFrustum;
+}
+
+void main()
+{
+    ivec2 chunkPosition = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.z);
+    vec2 chunkWorldPos = vec2(chunkPosition.x, chunkPosition.y) * chunkSize;
+    Frustum cameraFrustum = createCameraFrustum();
+    //Chunks
+    uint chunkIndex = chunkPosition.y * gl_NumWorkGroups.x + chunkPosition.x;
+    vec3 min = vec3(chunkWorldPos.x, 0.0, chunkWorldPos.y);
+	vec3 max = vec3(min.x + chunkSize, 50.0, min.z + chunkSize);
+
+    if(aabbIsOnFrustum(createAABB(min, max), cameraFrustum))
+        outputData.renderChunkPositions[chunkIndex] = 1;
+    else
+        outputData.renderChunkPositions[chunkIndex] = 0;
+
+    //Rendertiles
+    int renderTilesPerChunkSide = chunkSize / renderTileSize;
+    for(int y = 0; y < renderTilesPerChunkSide; y++)
+    {
+        for(int x = 0; x < renderTilesPerChunkSide; x++)
+        {
+            uint tileIndex = (gl_NumWorkGroups.x * gl_NumWorkGroups.z) + chunkIndex + (y * renderTilesPerChunkSide + x);
+            if(outputData.renderChunkPositions[chunkIndex] == 0)
+            {
+                outputData.renderChunkPositions[tileIndex] = 0;
+                continue;
+            }
+
+	        min = vec3(chunkWorldPos.x + renderTileSize * x, 0.0f, chunkWorldPos.y + renderTileSize * y);
+	        max = vec3(min.x + renderTileSize, 50.0f, min.z + renderTileSize);
+	        if(aabbIsOnFrustum(createAABB(min, max), cameraFrustum))
+                outputData.renderChunkPositions[tileIndex] = 1;
+            else
+                outputData.renderChunkPositions[tileIndex] = 0;
+        }
+    }
+}

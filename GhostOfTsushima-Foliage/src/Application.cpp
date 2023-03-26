@@ -68,6 +68,10 @@ void Application::Run()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        std::cout << "Frametime: " << std::to_string(deltaTime) << std::endl;
+
+        m_Camera->UpdateCameraVectors();
+
         processInput(window, deltaTime);
 
         Renderer::Instance().RenderScene(m_Scene, glfwGetTime());

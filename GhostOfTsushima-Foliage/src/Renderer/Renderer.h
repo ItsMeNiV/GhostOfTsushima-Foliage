@@ -22,9 +22,13 @@ public:
 
 private:
 	Renderer()
-		:	m_MultisampledFramebuffer(CreateScope<Framebuffer>(1920, 1080, Util::GlobalConfig::MSAASamples)),
-			m_Framebuffer(CreateScope<Framebuffer>(1920, 1080)),
-			m_FullscreenShader(CreateScope<Shader>("assets/shaders/fullscreen.vert", "assets/shaders/fullscreen.frag"))
+		: m_MultisampledFramebuffer(CreateScope<Framebuffer>(1920, 1080, Util::GlobalConfig::MSAASamples)),
+		m_Framebuffer(CreateScope<Framebuffer>(1920, 1080)),
+		m_FullscreenShader(CreateScope<Shader>("assets/shaders/fullscreen.vert", "assets/shaders/fullscreen.frag")),
+		m_FrustumCullTerrainComputeShader(CreateScope<Shader>("assets/shaders/frustumcull_terrain.comp")),
+		m_ChunksToRenderArray(nullptr),
+		m_TilesToRenderArray(nullptr),
+		initialRender(true)
 	{
 		float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
@@ -46,13 +50,29 @@ private:
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glBindVertexArray(0);
+
+		glGenBuffers(1, &m_ComputeBufferTerrain);
+	}
+
+	~Renderer()
+	{
+		glDeleteBuffers(1, &m_QuadVertexBuffer);
+		glDeleteBuffers(1, &m_ComputeBufferTerrain);
+		glDeleteVertexArrays(1, &m_QuadVertexArray);
+		delete[] m_ChunksToRenderArray;
+		delete[] m_TilesToRenderArray;
 	}
 
 	std::unordered_map<Ref<Chunk>, std::vector<Ref<RenderTile>>, Util::HashChunk, Util::ChunkComparator> m_ChunkRenderTileMap;
 	Scope<Framebuffer> m_MultisampledFramebuffer;
 	Scope<Framebuffer> m_Framebuffer;
 	Scope<Shader> m_FullscreenShader;
+	Scope<Shader> m_FrustumCullTerrainComputeShader;
 	unsigned int m_QuadVertexArray, m_QuadVertexBuffer;
+	unsigned int m_ComputeBufferTerrain;
+	uint32_t* m_ChunksToRenderArray;
+	uint32_t* m_TilesToRenderArray;
+	bool initialRender;
 
 	void createRenderTiles(Ref<Chunk> chunk, Ref<World> world);
 	void drawTerrain(Scene& scene, float time);
