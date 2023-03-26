@@ -101,6 +101,7 @@ void main()
 {
     ivec2 chunkPosition = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.z);
     vec2 chunkWorldPos = vec2(chunkPosition.x, chunkPosition.y) * chunkSize;
+    uint indexOffsetTiles = gl_NumWorkGroups.x * gl_NumWorkGroups.z;
     Frustum cameraFrustum = createCameraFrustum();
     //Chunks
     uint chunkIndex = chunkPosition.y * gl_NumWorkGroups.x + chunkPosition.x;
@@ -114,19 +115,15 @@ void main()
 
     //Rendertiles
     int renderTilesPerChunkSide = chunkSize / renderTileSize;
+    int renderTilesPerChunk = renderTilesPerChunkSide*renderTilesPerChunkSide;
     for(int y = 0; y < renderTilesPerChunkSide; y++)
     {
         for(int x = 0; x < renderTilesPerChunkSide; x++)
         {
-            uint tileIndex = (gl_NumWorkGroups.x * gl_NumWorkGroups.z) + chunkIndex + (y * renderTilesPerChunkSide + x);
-            if(outputData.renderChunkPositions[chunkIndex] == 0)
-            {
-                outputData.renderChunkPositions[tileIndex] = 0;
-                continue;
-            }
+            uint tileIndex = indexOffsetTiles + (chunkIndex*renderTilesPerChunk) + (y * renderTilesPerChunkSide + x); //TODO: Check logic
 
-	        min = vec3(chunkWorldPos.x + renderTileSize * x, 0.0f, chunkWorldPos.y + renderTileSize * y);
-	        max = vec3(min.x + renderTileSize, 50.0f, min.z + renderTileSize);
+	        min = vec3(chunkWorldPos.x + (renderTileSize * x), 0.0, chunkWorldPos.y + (renderTileSize * y));
+	        max = vec3(min.x + renderTileSize, 50.0, min.z + renderTileSize);
 	        if(aabbIsOnFrustum(createAABB(min, max), cameraFrustum))
                 outputData.renderChunkPositions[tileIndex] = 1;
             else

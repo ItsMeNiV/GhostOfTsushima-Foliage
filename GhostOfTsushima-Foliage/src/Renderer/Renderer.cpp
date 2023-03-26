@@ -124,14 +124,14 @@ void Renderer::drawTerrain(Scene& scene, float time)
         auto chunk = chunkPosPair.second;
 
         //Check if chunk is on camera frustum
-        int index = chunk->GetPosition().y * scene.World->GetWidth() + chunk->GetPosition().x;
-        if (!m_ChunksToRenderArray[index])
+        int chunkIndex = chunk->GetPosition().y * scene.World->GetWidth() + chunk->GetPosition().x;
+        if (!m_ChunksToRenderArray[chunkIndex])
             continue;
 
         for (auto renderTile : m_ChunkRenderTileMap.at(chunk))
         {
-            index = renderTile->GetPosition().y * Util::GlobalConfig::RenderTilesPerChunkSide + renderTile->GetPosition().x;
-            if (!m_TilesToRenderArray[index])
+            int tileIndex = (chunkIndex * pow(Util::GlobalConfig::RenderTilesPerChunkSide, 2)) + (renderTile->GetPosition().y * Util::GlobalConfig::RenderTilesPerChunkSide + renderTile->GetPosition().x);
+            if (!m_TilesToRenderArray[tileIndex])
                 continue;
 
             GrassSystem::Instance().DrawRenderTile(renderTile, scene.Camera, time);
