@@ -75,7 +75,7 @@ void main()
 	if(shouldDrawGrassblade)
 	{
 		outputData.grassBladeData[index].position = position;
-		outputData.grassBladeData[index].height = max(rand(gl_GlobalInvocationID.xz), 0.4);
+		outputData.grassBladeData[index].height = min(max(rand(gl_GlobalInvocationID.xz), 0.2), 0.5);
 		outputData.grassBladeData[index].hash = murmurHash12(gl_GlobalInvocationID.xz);
 	}
 	else
