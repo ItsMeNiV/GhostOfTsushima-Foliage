@@ -10,7 +10,7 @@ layout (location = 5) in uint aInstanceHash;
 
 out vec2 v_TexCoord;
 out float v_PixelHeight;
-out vec3 v_Normal;
+out mat3 v_TBN;
 out vec3 v_FragPos;
 
 uniform mat4 view;
@@ -57,7 +57,14 @@ void main()
     mat3 grassBladeModelMatrix = mat3(right, up, cameraToVertex);
     grassBladeModelMatrix[1][1] *= aInstanceHeight; //matrix [1][1] => Scale Y
 
-    v_Normal = cameraToVertex;
+    vec3 normal = cameraToVertex;
+    vec3 tangent = right;
+    vec3 bitangent = normalize(cross(normal, tangent));
+    vec3 T = normalize(grassBladeModelMatrix * tangent);
+    vec3 B = normalize(grassBladeModelMatrix * bitangent);
+    vec3 N = normalize(grassBladeModelMatrix * normal);
+    v_TBN = mat3(T, B, N);
+
 
     v_FragPos = vertexWorldPos.xyz;
 

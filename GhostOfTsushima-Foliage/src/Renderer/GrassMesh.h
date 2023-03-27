@@ -43,10 +43,12 @@ public:
 	}
 
 	Ref<Texture> GetGrassbladeDiffuseTexture() { return m_GrassbladeDiffuseTexture; }
+	Ref<Texture> GetGrassbladeNormalTexture() { return m_GrassbladeNormalTexture; }
 
 private:
 	unsigned int m_VertexArray;
 	unsigned int m_VertexBuffer;
 	unsigned int m_IndexBuffer;
 	Ref<Texture> m_GrassbladeDiffuseTexture;
+	Ref<Texture> m_GrassbladeNormalTexture;
 };

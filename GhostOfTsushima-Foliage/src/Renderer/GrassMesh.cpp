@@ -3,7 +3,8 @@
 
 GrassMesh::GrassMesh()
 {
-	m_GrassbladeDiffuseTexture = CreateRef<Texture>("assets/textures/Grassblade.png");
+	m_GrassbladeDiffuseTexture = CreateRef<Texture>("assets/textures/Grassblade_Diffuse.png");
+	m_GrassbladeNormalTexture = CreateRef<Texture>("assets/textures/Grassblade_Normal.png");
 
 	glGenVertexArrays(1, &m_VertexArray);
 	glBindVertexArray(m_VertexArray);

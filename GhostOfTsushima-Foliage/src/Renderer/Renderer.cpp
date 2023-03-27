@@ -63,6 +63,8 @@ void Renderer::drawTerrain(Scene& scene, float time)
         glBufferStorage(GL_SHADER_STORAGE_BUFFER, (chunkCount + renderTileCount) * sizeof(uint32_t), 0, GL_MAP_READ_BIT);
         m_ChunksToRenderArray = new uint32_t[chunkCount];
         m_TilesToRenderArray = new uint32_t[renderTileCount];
+        memset(m_ChunksToRenderArray, 1, chunkCount);
+        memset(m_TilesToRenderArray, 1, renderTileCount);
         initialRender = false;
     }
 

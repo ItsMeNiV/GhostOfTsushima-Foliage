@@ -44,6 +44,8 @@ void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera,
     m_GrassbladeShader->SetMat4("renderTileModel", renderTile->GetModelMatrix());
     m_GrassbladeMesh->GetGrassbladeDiffuseTexture()->ActivateForSlot(0);
     m_GrassbladeShader->SetTexture("grassbladeTexture", 0);
+    m_GrassbladeMesh->GetGrassbladeDiffuseTexture()->ActivateForSlot(1);
+    m_GrassbladeShader->SetTexture("grassbladeNormalMap", 1);
     m_GrassbladeShader->SetFloat("time", time);
     m_GrassbladeMesh->BindVertexArray();
     glDrawElementsInstanced(GL_TRIANGLES, 15, GL_UNSIGNED_INT, 0, renderTile->GetGrassBladeCount());

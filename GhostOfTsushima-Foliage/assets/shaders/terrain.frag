@@ -25,9 +25,9 @@ DirectionalLight light;
 void main()
 {
     light.Direction = vec3(-0.1, -1.0, -0.7);
-    light.Ambient = vec3(0.04, 0.02, 0.01);
-    light.Diffuse = vec3(1.0, 0.81, 0.64);
-    light.Specular = vec3(1.0, 0.81, 0.64);
+    light.Ambient = vec3(0.41, 0.22, 0.07);
+    light.Diffuse = vec3(0.66, 0.54, 0.43);
+    light.Specular = vec3(1, 0.96, 0.93);
 
 	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 normal = normalize(fs_in.Normal);
@@ -42,9 +42,9 @@ void main()
 
     vec3 ambient = light.Ambient;
     vec3 diffuse = light.Diffuse * diff;
-    vec3 specular = light.Specular * spec;
+    //vec3 specular = light.Specular * spec;
 
-    vec3 fragResult = (ambient + diffuse + specular) * terrainColor;
+    vec3 fragResult = (ambient + diffuse) * (terrainColor*0.5);
 	
 	FragColor = vec4(fragResult, 1.0);
 }
