@@ -26,7 +26,7 @@ vec3 toBezier(float yValue)
 {
     vec3 pZero = vec3(0.0, 0.0, 0.0);
     vec3 pOne = vec3(0.0, 0.5, 0.0);
-    vec3 pTwo = vec3(0.0, 1.0, maxSway);
+    vec3 pTwo = vec3(0.0 * windDirection.x, 1.0, maxSway * windDirection.y);
     return (1-yValue) * ((1-yValue) * pZero + yValue*pOne) + yValue * ((1-yValue) * pOne + yValue*pTwo);
 }
 vec3 toBezierDerivative(float yValue)
@@ -43,7 +43,7 @@ void main()
     v_PixelHeight = aPos.y;
 
     // Swaying
-    maxSway = abs(cos(((aInstanceHash / 1000000) + time*0.3)) / 10);
+    maxSway = abs(cos((((aInstanceHash>>10000) + time) * 0.3)) / 10);
 
     vec3 position = aPos;
     position += toBezier(position.y);

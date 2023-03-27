@@ -24,7 +24,7 @@ DirectionalLight light;
 
 void main()
 {
-    light.Direction = vec3(-0.1, -1.0, -0.7);
+    light.Direction = vec3(-0.1, -1.0, -0.5);
     light.Ambient = vec3(0.61, 0.32, 0.1);
     light.Diffuse = vec3(1, 0.86, 0.73);
     light.Specular = vec3(1, 0.96, 0.93);
@@ -38,7 +38,7 @@ void main()
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     float diff = max(dot(normal, lightDir), 0.0);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 1024);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 256);
 
 	vec3 grassColor = mix(vec3(0.0), texture(grassbladeTexture, v_TexCoord).rgb, v_PixelHeight+0.1);
 
