@@ -40,8 +40,8 @@ light.Direction = vec3(-0.1, -1.0, -0.7);
     vec3 grassColor = mix(vec3(0.0), texture(grassbladeTexture, v_TexCoord).rgb, v_PixelHeight);
 	grassColor = mix(vec3(1.0), texture(grassbladeTexture, v_TexCoord).rgb, -v_PixelHeight+1.7);
 
-    vec3 ambient = light.Ambient * grassColor;
-    vec3 diffuse = light.Diffuse * diff * grassColor;
+    vec3 ambient = light.Ambient;
+    vec3 diffuse = light.Diffuse * diff;
     vec3 specular = light.Specular * spec;
 
     vec3 fragResult = (ambient + diffuse + specular) * grassColor;

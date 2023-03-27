@@ -43,7 +43,7 @@ void main()
     v_PixelHeight = aPos.y;
 
     // Swaying
-    maxSway = abs(cos(((aInstanceHash / 1000000) + time*0.5)) / 10);
+    maxSway = abs(cos(((aInstanceHash / 1000000) + time*0.3)) / 10);
 
     vec3 position = aPos;
     position += toBezier(position.y);
@@ -57,7 +57,7 @@ void main()
     mat3 grassBladeModelMatrix = mat3(right, up, cameraToVertex);
     grassBladeModelMatrix[1][1] *= aInstanceHeight; //matrix [1][1] => Scale Y
 
-    v_Normal = toBezier(position.y);
+    v_Normal = cameraToVertex;
 
     v_FragPos = vertexWorldPos.xyz;
 
