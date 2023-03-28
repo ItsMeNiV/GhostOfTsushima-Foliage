@@ -19,14 +19,14 @@ uniform mat4 renderTileModel;
 uniform vec3 cameraPos;
 uniform float time;
 
-vec2 windDirection = normalize(vec2(1.5, 0.5));
-float maxSway = 0.1;
+vec2 windDirection = normalize(vec2(1.5, 1.5));
+float maxSway = 1.0;
 
 vec3 toBezier(float yValue)
 {
     vec3 pZero = vec3(0.0, 0.0, 0.0);
     vec3 pOne = vec3(0.0, 0.5, 0.0);
-    vec3 pTwo = vec3(0.0 * windDirection.x, 1.0, maxSway * windDirection.y);
+    vec3 pTwo = vec3(maxSway * windDirection.x, 1.0, maxSway * windDirection.y);
     return (1-yValue) * ((1-yValue) * pZero + yValue*pOne) + yValue * ((1-yValue) * pOne + yValue*pTwo);
 }
 vec3 toBezierDerivative(float yValue)
@@ -42,6 +42,9 @@ void main()
     v_TexCoord = vec2(aTexCoord, 0.0);
     v_PixelHeight = aPos.y;
 
+    //TEST
+    windDirection = normalize(vec2(sin(time), cos(time)));
+
     // Swaying
     maxSway = abs(cos((((aInstanceHash>>10000) + time) * 0.3)) / 10);
 
@@ -53,7 +56,7 @@ void main()
     vec3 cameraToVertex = normalize(vec3(vertexWorldPos) - cameraPos);
     vec3 up = normalize(toBezierDerivative(position.y));
     vec3 right = normalize(cross(cameraToVertex, up));
-    cameraToVertex = normalize(cross(up, right));
+    //cameraToVertex = normalize(cross(up, right));
     mat3 grassBladeModelMatrix = mat3(right, up, cameraToVertex);
     grassBladeModelMatrix[1][1] *= aInstanceHeight; //matrix [1][1] => Scale Y
 

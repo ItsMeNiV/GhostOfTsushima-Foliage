@@ -72,7 +72,7 @@ Texture::Texture(int width, int height, int sampleCount)
     glGenTextures(1, &m_TextureId);
     glBindTexture(m_TextureType, m_TextureId);
     if (sampleCount > 1)
-        glTexImage2DMultisample(m_TextureType, sampleCount, GL_RGB, width, height, GL_TRUE);
+        glTexImage2DMultisample(m_TextureType, sampleCount, GL_RGBA16F, width, height, GL_TRUE);
     else
         glTexImage2D(m_TextureType, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
     glTexParameteri(m_TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
