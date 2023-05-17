@@ -3,8 +3,8 @@
 #include "Util/Util.h"
 
 GrassSystem::GrassSystem()
-    : m_ComputeShader(CreateScope<Shader>("assets/shaders/grass_system.comp")),
-	m_GrassbladeShader(CreateScope<Shader>("assets/shaders/grass.vert", "assets/shaders/grass.frag")),
+    : m_ComputeShader(CreateScope<Shader>("assets/shaders/grass_system.comp", ShaderType::COMPUTE)),
+	m_GrassbladeShader(CreateScope<Shader>("assets/shaders/grass.glsl", ShaderType::VERTEX_AND_FRAGMENT)),
 	m_GrassbladeMesh(CreateScope<GrassMesh>())
 {
     m_GrassbladeMesh->BindVertexArray();
@@ -24,7 +24,7 @@ GrassSystem::GrassSystem()
 
 void GrassSystem::DrawRenderTile(Ref<RenderTile> renderTile, Ref<Camera> camera, float time)
 {
-    m_GrassbladeShader->Use();
+    m_GrassbladeShader->Bind();
     // Buffer Matrices
     m_GrassbladeMesh->BindVertexArray();
     glBindBuffer(GL_ARRAY_BUFFER, m_GrassBladeDataBuffer);
@@ -56,7 +56,7 @@ void GrassSystem::GenerateGrassData(RenderTile& renderTile, Ref<World> world)
 {
     uint32_t bladeCount = pow(Util::GlobalConfig::GrassBladesPerRenderTileSide, 2);
 
-    m_ComputeShader->Use();
+    m_ComputeShader->Bind();
     unsigned int ssbo;
     glGenBuffers(1, &ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);

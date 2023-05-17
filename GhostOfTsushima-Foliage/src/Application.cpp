@@ -33,8 +33,8 @@ Application::Application()
     loadWorld(0);
     m_Scene.Camera = m_Camera;
     m_Scene.World = m_World;
-    m_Scene.TerrainShader = CreateRef<Shader>("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
-    m_Scene.SkyboxShader = CreateRef<Shader>("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
+    m_Scene.TerrainShader = CreateRef<Shader>("assets/shaders/terrain.glsl", ShaderType::VERTEX_AND_FRAGMENT);
+    m_Scene.SkyboxShader = CreateRef<Shader>("assets/shaders/skybox.glsl", ShaderType::VERTEX_AND_FRAGMENT);
 
     m_Scene.Offsets = new glm::vec2[1000];
     float offset = 0.1f;

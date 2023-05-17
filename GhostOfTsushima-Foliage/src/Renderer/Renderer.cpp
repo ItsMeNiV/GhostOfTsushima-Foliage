@@ -24,7 +24,7 @@ void Renderer::RenderScene(Scene& scene, float time)
     m_MultisampledFramebuffer->Unbind();
 
     m_MultisampledFramebuffer->BlitFramebuffer(m_Framebuffer->GetId());
-    m_FullscreenShader->Use();
+    m_FullscreenShader->Bind();
     m_FullscreenShader->SetInt("screenTexture", 0);
     m_Framebuffer->GetTextureColorBuffer()->ActivateForSlot(0);
     glBindVertexArray(m_QuadVertexArray);
@@ -45,7 +45,7 @@ void Renderer::DrawLine(glm::vec3 position, glm::vec3 direction, glm::vec3 color
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    m_LineDebugShader->Use();
+    m_LineDebugShader->Bind();
     glm::mat4 viewProjection = scene.Camera->GetViewProjection();
     m_LineDebugShader->SetMat4("viewProjection", viewProjection);
     m_LineDebugShader->SetVec3("color", color);
@@ -76,7 +76,7 @@ void Renderer::drawTerrain(Scene& scene, float time)
     uint32_t chunkCount = scene.World->GetChunks().size();
     uint32_t renderTileCount = scene.World->GetChunks().size() * pow(Util::GlobalConfig::RenderTilesPerChunkSide, 2);
 
-    m_FrustumCullTerrainComputeShader->Use();
+    m_FrustumCullTerrainComputeShader->Bind();
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ComputeBufferTerrain);
     int ssbo_binding = 0;
     m_FrustumCullTerrainComputeShader->SetShaderStorageBlockBinding(0, ssbo_binding);
@@ -107,7 +107,7 @@ void Renderer::drawTerrain(Scene& scene, float time)
     memcpy(m_TilesToRenderArray, &p[chunkCount], renderTileCount * sizeof(uint32_t));
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
-    scene.TerrainShader->Use();
+    scene.TerrainShader->Bind();
     glm::mat4 viewProjection = scene.Camera->GetViewProjection();
     scene.TerrainShader->SetMat4("viewProjection", viewProjection);
     scene.TerrainShader->SetVec3("viewPos", scene.Camera->GetPosition());
@@ -176,7 +176,7 @@ void Renderer::drawSkybox(Scene& scene)
     glDisable(GL_CULL_FACE);
     glDepthFunc(GL_LEQUAL);
     scene.World->GetSkybox()->Bind();
-    scene.SkyboxShader->Use();
+    scene.SkyboxShader->Bind();
     scene.SkyboxShader->SetMat4("projection", scene.Camera->GetProjection());
     glm::mat4 view = glm::mat4(glm::mat3(scene.Camera->GetView()));
     scene.SkyboxShader->SetMat4("view", view);

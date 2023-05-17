@@ -25,9 +25,9 @@ private:
 	Renderer()
 		: m_MultisampledFramebuffer(CreateScope<Framebuffer>(1920, 1080, Util::GlobalConfig::MSAASamples)),
 		m_Framebuffer(CreateScope<Framebuffer>(1920, 1080)),
-		m_FullscreenShader(CreateScope<Shader>("assets/shaders/fullscreen.vert", "assets/shaders/fullscreen.frag")),
-		m_FrustumCullTerrainComputeShader(CreateScope<Shader>("assets/shaders/frustumcull_terrain.comp")),
-		m_LineDebugShader(CreateScope<Shader>("assets/shaders/linedebug.vert", "assets/shaders/linedebug.frag")),
+		m_FullscreenShader(CreateScope<Shader>("assets/shaders/fullscreen.glsl", ShaderType::VERTEX_AND_FRAGMENT)),
+		m_FrustumCullTerrainComputeShader(CreateScope<Shader>("assets/shaders/frustumcull_terrain.comp", ShaderType::COMPUTE)),
+		m_LineDebugShader(CreateScope<Shader>("assets/shaders/linedebug.glsl", ShaderType::VERTEX_AND_FRAGMENT)),
 		m_ChunksToRenderArray(nullptr),
 		m_TilesToRenderArray(nullptr),
 		initialRender(true)
