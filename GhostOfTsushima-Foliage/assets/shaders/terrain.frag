@@ -25,9 +25,9 @@ DirectionalLight light;
 void main()
 {
     light.Direction = vec3(-0.1, -1.0, -0.7);
-    light.Ambient = vec3(0.41, 0.22, 0.07);
-    light.Diffuse = vec3(0.66, 0.54, 0.43);
-    light.Specular = vec3(1, 0.96, 0.93);
+    light.Ambient = vec3(0.21, 0.11, 0.04);
+    light.Diffuse = vec3(0.36, 0.29, 0.23);
+    //light.Specular = vec3(1, 0.96, 0.93);
 
 	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 normal = normalize(fs_in.Normal);
@@ -36,7 +36,7 @@ void main()
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     float diff = max(dot(normal, lightDir), 0.0);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32);
+    //float spec = pow(max(dot(normal, halfwayDir), 0.0), 32);
 
     vec3 terrainColor = texture(diffuseTexture, fs_in.TexCoords).rgb;
 

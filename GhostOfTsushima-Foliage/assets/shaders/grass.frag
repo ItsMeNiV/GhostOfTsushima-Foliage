@@ -13,6 +13,7 @@ in vec2 v_TexCoord;
 in float v_PixelHeight;
 in mat3 v_TBN;
 in vec3 v_FragPos;
+in vec3 v_Test;
 
 out vec4 FragColor;
 
@@ -38,7 +39,7 @@ void main()
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     float diff = max(dot(normal, lightDir), 0.0);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 256);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 128);
 
 	vec3 grassColor = mix(vec3(0.0), texture(grassbladeTexture, v_TexCoord).rgb, v_PixelHeight+0.1);
 
@@ -49,5 +50,6 @@ void main()
     vec3 fragResult = (ambient + diffuse + specular) * grassColor;
 
 	
+	//FragColor = vec4(v_Test, 1.0);
 	FragColor = vec4(fragResult, 1.0);
 }

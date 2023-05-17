@@ -68,7 +68,7 @@ void Application::Run()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        std::cout << "Frametime: " << std::to_string(deltaTime) << std::endl;
+        //std::cout << "Frametime: " << std::to_string(deltaTime) << std::endl;
 
         m_Camera->UpdateCameraVectors();
 

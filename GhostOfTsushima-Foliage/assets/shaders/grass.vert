@@ -12,6 +12,7 @@ out vec2 v_TexCoord;
 out float v_PixelHeight;
 out mat3 v_TBN;
 out vec3 v_FragPos;
+out vec3 v_Test;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -55,19 +56,19 @@ void main()
     //Rotate towards camera
     vec3 cameraToVertex = normalize(vec3(vertexWorldPos) - cameraPos);
     vec3 up = normalize(toBezierDerivative(position.y));
-    vec3 right = normalize(cross(cameraToVertex, up));
+    //vec3 right = normalize(cross(cameraToVertex, up));
+    vec3 right = vec3(view[0][0], view[1][0], view[2][0]);
     //cameraToVertex = normalize(cross(up, right));
     mat3 grassBladeModelMatrix = mat3(right, up, cameraToVertex);
     grassBladeModelMatrix[1][1] *= aInstanceHeight; //matrix [1][1] => Scale Y
 
-    vec3 normal = cameraToVertex;
+    vec3 normal = normalize(cross(up, right));
     vec3 tangent = right;
     vec3 bitangent = normalize(cross(normal, tangent));
     vec3 T = normalize(grassBladeModelMatrix * tangent);
     vec3 B = normalize(grassBladeModelMatrix * bitangent);
     vec3 N = normalize(grassBladeModelMatrix * normal);
     v_TBN = mat3(T, B, N);
-
 
     v_FragPos = vertexWorldPos.xyz;
 

@@ -19,6 +19,7 @@ public:
 	}
 
 	void RenderScene(Scene& scene, float time);
+	void DrawLine(glm::vec3 position, glm::vec3 direction, glm::vec3 color, Scene& scene);
 
 private:
 	Renderer()
@@ -26,6 +27,7 @@ private:
 		m_Framebuffer(CreateScope<Framebuffer>(1920, 1080)),
 		m_FullscreenShader(CreateScope<Shader>("assets/shaders/fullscreen.vert", "assets/shaders/fullscreen.frag")),
 		m_FrustumCullTerrainComputeShader(CreateScope<Shader>("assets/shaders/frustumcull_terrain.comp")),
+		m_LineDebugShader(CreateScope<Shader>("assets/shaders/linedebug.vert", "assets/shaders/linedebug.frag")),
 		m_ChunksToRenderArray(nullptr),
 		m_TilesToRenderArray(nullptr),
 		initialRender(true)
@@ -68,6 +70,7 @@ private:
 	Scope<Framebuffer> m_Framebuffer;
 	Scope<Shader> m_FullscreenShader;
 	Scope<Shader> m_FrustumCullTerrainComputeShader;
+	Scope<Shader> m_LineDebugShader;
 	unsigned int m_QuadVertexArray, m_QuadVertexBuffer;
 	unsigned int m_ComputeBufferTerrain;
 	uint32_t* m_ChunksToRenderArray;

@@ -32,6 +32,29 @@ void Renderer::RenderScene(Scene& scene, float time)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+void Renderer::DrawLine(glm::vec3 position, glm::vec3 direction, glm::vec3 color, Scene& scene)
+{
+    glm::vec3 points[] = {position, position + direction};
+    uint32_t lineVertexBuffer, lineVertexArray;
+    glCreateVertexArrays(1, &lineVertexArray);
+    glBindVertexArray(lineVertexArray);
+    
+    glCreateBuffers(1, &lineVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, lineVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    m_LineDebugShader->Use();
+    glm::mat4 viewProjection = scene.Camera->GetViewProjection();
+    m_LineDebugShader->SetMat4("viewProjection", viewProjection);
+    m_LineDebugShader->SetVec3("color", color);
+
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Renderer::createRenderTiles(Ref<Chunk> chunk, Ref<World> world)
 {
     std::vector<Ref<RenderTile>> renderTiles;
@@ -141,6 +164,11 @@ void Renderer::drawTerrain(Scene& scene, float time)
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    glm::vec3 linePos = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 lineDir = { 0.0f, 10.0f, 0.0f };
+    //TEST
+    DrawLine(linePos, lineDir, { 1.0f, 0.0f, 0.0f }, scene);
 }
 
 void Renderer::drawSkybox(Scene& scene)
